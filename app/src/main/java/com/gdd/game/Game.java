@@ -122,8 +122,11 @@ public class Game {
 
     public synchronized void render()
     {
-        // render scene and ui
+        // clear the screen with black
+        canvas.drawARGB(255, 0, 0, 0);
+        // render scene
         sceneController.render(canvas);
+        // render ui
         uiController.draw(canvas);
     }
 
