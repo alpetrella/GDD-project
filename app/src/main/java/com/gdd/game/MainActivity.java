@@ -52,7 +52,7 @@ public class MainActivity extends Activity {
 
         Bitmap frameBuffer = Bitmap.createBitmap(Settings.fbufferWidth, Settings.fbufferHeight,
                 Bitmap.Config.ARGB_8888);
-        GameWorld gw = new GameWorld(this, frameBuffer, worldSize, screenSize);
+        Game gw = new Game(this, frameBuffer, worldSize, screenSize);
 
         // ***** SURFACE VIEW *****
         renderView = new AndroidFastRenderView(this, gw);
