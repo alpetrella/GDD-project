@@ -1,6 +1,7 @@
 package com.gdd.game.engine.components;
 
-import com.google.fpl.liquidfun.Transform;
+import com.gdd.game.engine.Component;
+import com.gdd.game.engine.ComponentType;
 
 public class TransformComponent extends Component {
 

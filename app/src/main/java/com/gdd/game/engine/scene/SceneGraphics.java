@@ -1,13 +1,16 @@
-package com.gdd.game.engine;
+package com.gdd.game.engine.scene;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
-import com.gdd.game.engine.components.Component;
-import com.gdd.game.engine.components.ComponentType;
+import com.gdd.game.engine.Actor;
+import com.gdd.game.engine.ScreenTransform;
+import com.gdd.game.engine.Component;
+import com.gdd.game.engine.ComponentType;
 import com.gdd.game.engine.components.DrawableComponent;
+import com.gdd.game.engine.components.PhysicsComponent;
 import com.gdd.game.engine.components.TransformComponent;
 
 import java.util.List;
@@ -37,8 +40,14 @@ public class SceneGraphics {
         for(Actor a : actors) {
             Component c = a.getComponent(ComponentType.DRAWABLE);
             if(c != null) {
-                DrawableComponent dc = (DrawableComponent) c;
                 TransformComponent tc = a.getTransformComponent();
+                DrawableComponent dc = (DrawableComponent) c;
+
+                float x, y;
+                float width, height;
+                float angle;
+
+
 
                 // 1. CULLING: chiede alla Camera
                 if( !camera.isVisible(tc.x, tc.y, tc.width/2, tc.height/2) )

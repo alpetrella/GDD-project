@@ -6,7 +6,7 @@ import android.graphics.RectF;
 
 import com.gdd.game.engine.ScreenTransform;
 
-public class RectDrawable extends DrawableComponent {
+public class RectDrawableComponent extends DrawableComponent {
 
     @Override
     public void draw(Canvas canvas, Paint paint, ScreenTransform t, RectF dst) {

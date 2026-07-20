@@ -1,7 +1,6 @@
 package com.gdd.game.engine;
 
-import com.gdd.game.engine.components.Component;
-import com.gdd.game.engine.components.ComponentType;
+import com.gdd.game.engine.components.PhysicsComponent;
 import com.gdd.game.engine.components.TransformComponent;
 
 import java.util.EnumMap;

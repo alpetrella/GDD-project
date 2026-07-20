@@ -6,17 +6,11 @@ import android.graphics.Canvas;
 
 import com.badlogic.androidgames.framework.Input;
 import com.badlogic.androidgames.framework.impl.TouchHandler;
-import com.gdd.game.engine.Camera;
-import com.gdd.game.engine.SceneController;
-import com.gdd.game.engine.SceneInput;
+import com.gdd.game.engine.scene.SceneController;
 import com.gdd.game.ui.Button;
 import com.gdd.game.ui.UIController;
 import com.gdd.game.ui.WidgetGroup;
 import com.gdd.game.ui.WidgetGroupImp;
-import com.google.fpl.liquidfun.ParticleSystem;
-import com.google.fpl.liquidfun.World;
-
-import java.util.Random;
 
 public class Game {
 

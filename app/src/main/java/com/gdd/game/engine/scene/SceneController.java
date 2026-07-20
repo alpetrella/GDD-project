@@ -1,11 +1,15 @@
-package com.gdd.game.engine;
+package com.gdd.game.engine.scene;
 
 import android.graphics.Canvas;
 
 import com.badlogic.androidgames.framework.Input;
 import com.gdd.game.Game;
 import com.gdd.game.Settings;
-import com.gdd.game.engine.components.RectDrawable;
+import com.gdd.game.engine.Actor;
+import com.gdd.game.engine.ComponentType;
+import com.gdd.game.engine.PhysicsSystem;
+import com.gdd.game.engine.components.PhysicsComponent;
+import com.gdd.game.engine.components.RectDrawableComponent;
 import com.gdd.game.engine.components.TransformComponent;
 
 import java.util.ArrayList;
@@ -19,7 +23,7 @@ public class SceneController {
     private SceneInput sInput;
     private SceneGraphics sGraphics;
     private SceneAudio sAudio;
-    private ScenePhysics sPhysics;
+    private PhysicsSystem sPhysics;
 
     private List<Actor> actors;
 
@@ -40,7 +44,8 @@ public class SceneController {
         sInput = new SceneInput(camera);
         sGraphics = new SceneGraphics();
         sAudio = new SceneAudio();
-        sPhysics = new ScenePhysics();
+        sPhysics = new PhysicsSystem();
+        sPhysics.setGravity(0, 1);
 
         actors = new ArrayList<>();
         initActors();
@@ -50,16 +55,23 @@ public class SceneController {
         Actor a;
         TransformComponent tc;
 
-        // 1
-        a = new Actor();
-        a.addComponent( new RectDrawable() );
-        tc = a.getTransformComponent();
-        tc.angle = 90;
-        actors.add(a);
+        // TEST: physic actors
+        for (int i = 0; i < 10; i++) {
+            a = new Actor();
 
-        // 2
+            float x = 0.5f * i;
+            float y = -5f;
+            float angle = 15f * i;
+
+            a.addComponent(sPhysics.createComponent(x, y, angle));
+            a.addComponent(new RectDrawableComponent());
+            tc = a.getTransformComponent();
+            actors.add(a);
+        }
+
+        // basic actor
         a = new Actor();
-        a.addComponent( new RectDrawable() );
+        a.addComponent( new RectDrawableComponent() );
         tc = a.getTransformComponent();
         tc.y = 5;
         tc.angle = 50;
@@ -77,6 +89,18 @@ public class SceneController {
 
     public synchronized void update(float deltaTime)  {
 
+        // update physics
+        sPhysics.step(deltaTime);
+        // sync transform-physics
+        for (Actor a : actors) {
+            PhysicsComponent pc = (PhysicsComponent) a.getComponent(ComponentType.PHYSICS);
+            TransformComponent t = a.getTransformComponent();
+            if(pc != null) {
+                t.x = pc.getX();
+                t.y = pc.getY();
+                t.angle = pc.getAngle();
+            }
+        }
     }
 
 
@@ -85,6 +109,5 @@ public class SceneController {
         // draw actors
         sGraphics.render(canvas, camera, actors);
     }
-
 
 }

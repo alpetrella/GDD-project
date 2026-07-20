@@ -1,4 +1,4 @@
-package com.gdd.game.engine.components;
+package com.gdd.game.engine;
 
 public enum ComponentType {
 

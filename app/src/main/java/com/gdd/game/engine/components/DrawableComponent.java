@@ -4,6 +4,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
+import com.gdd.game.engine.Component;
+import com.gdd.game.engine.ComponentType;
 import com.gdd.game.engine.ScreenTransform;
 
 public abstract class DrawableComponent extends Component {

@@ -1,6 +1,5 @@
 package com.gdd.game.engine;
 
-// ============ Value scratch, riusato ogni frame per ogni actor ============
 public class ScreenTransform {
 
     public float screenX, screenY, halfWidthPx, halfHeightPx, rotation;
