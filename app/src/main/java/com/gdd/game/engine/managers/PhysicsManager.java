@@ -1,8 +1,10 @@
 package com.gdd.game.engine.managers;
 
 import com.gdd.game.engine.PhysicsParams;
+import com.gdd.game.engine.components.ComponentType;
 import com.gdd.game.engine.components.PhysicsComponent;
 import com.gdd.game.engine.core.Actor;
+import com.gdd.game.engine.core.Transform;
 import com.google.fpl.liquidfun.BodyDef;
 import com.google.fpl.liquidfun.BodyType;
 import com.google.fpl.liquidfun.CircleShape;
@@ -11,6 +13,8 @@ import com.google.fpl.liquidfun.PolygonShape;
 import com.google.fpl.liquidfun.Shape;
 import com.google.fpl.liquidfun.Vec2;
 import com.google.fpl.liquidfun.World;
+
+import java.util.List;
 
 public class PhysicsManager {
 
@@ -171,5 +175,21 @@ public class PhysicsManager {
         fdef.delete();
     }
 
+
+    public void syncTransform(List<Actor> actors) {
+
+        int n = actors.size();
+        for(int i=0; i<n; i++)  {
+            Actor a = actors.get(i);
+            Transform t = a.getTransform();
+
+            PhysicsComponent pc = (PhysicsComponent) a.getComponent(ComponentType.PHYSICS);
+            if(pc != null) {
+                t.x = pc.getX();
+                t.y = pc.getY();
+                t.angle = pc.getAngle();
+            }
+        }
+    }
 
 }

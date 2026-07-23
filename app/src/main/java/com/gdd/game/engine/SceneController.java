@@ -65,6 +65,7 @@ public class SceneController {
     }
 
     public void initPhysicsActors() {
+
         Actor a;
         float width, height, radius;
         PhysicsParams physicsParams = new PhysicsParams();
@@ -74,7 +75,6 @@ public class SceneController {
         // TEST: physic actors [box]
         width = 0.5f; height = 0.5f;
         for (int i = 0; i <= 5; i++) {
-
             a = new Actor();
             a.setShape(new Shape.Box(width, height));
             a.addComponent(new PrimitiveDrawable(
@@ -93,7 +93,6 @@ public class SceneController {
         radius = 0.25f;
         // TEST: physic actors [box]
         for (int i = 5; i <= 10 ; i++) {
-
             a = new Actor();
             a.setShape(new Shape.Circle(radius));
             a.addComponent(new PrimitiveDrawable(
@@ -120,18 +119,9 @@ public class SceneController {
 
         // update physics
         sPhysics.step(deltaTime);
-        // sync transform-physics (da spostare in physics?)
-        for (Actor a : actors) {
-            PhysicsComponent pc = (PhysicsComponent) a.getComponent(ComponentType.PHYSICS);
-            Transform t = a.getTransform();
-            if(pc != null) {
-                t.x = pc.getX();
-                t.y = pc.getY();
-                t.angle = pc.getAngle();
-            }
-        }
+        // sync transform-physics
+        sPhysics.syncTransform(actors);
     }
-
 
     public synchronized void render(Canvas canvas)
     {
