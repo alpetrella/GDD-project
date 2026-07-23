@@ -1,6 +1,4 @@
-package com.gdd.game.engine.scene;
-
-import com.gdd.game.Box;
+package com.gdd.game.engine;
 
 public class Camera {
 

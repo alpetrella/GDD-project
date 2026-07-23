@@ -14,6 +14,7 @@ import com.badlogic.androidgames.framework.Audio;
 import com.badlogic.androidgames.framework.Music;
 import com.badlogic.androidgames.framework.impl.AndroidAudio;
 import com.badlogic.androidgames.framework.impl.MultiTouchHandler;
+import com.gdd.game.engine.Box;
 
 public class MainActivity extends Activity {
 
