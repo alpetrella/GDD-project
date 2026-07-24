@@ -15,10 +15,15 @@ public class PhysicsComponent extends Component {
         this.body = body;
     }
 
+    public void syncTransform() {
+        owner.transform.x = body.getPositionX();
+        owner.transform.y = body.getPositionY();
+        owner.transform.angle = body.getAngle();
+    }
+
     public float getX() { return body.getPositionX(); }
 
     public float getY() { return body.getPositionY(); }
 
     public float getAngle() { return body.getAngle(); }
-
 }

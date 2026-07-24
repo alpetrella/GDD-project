@@ -8,8 +8,8 @@ import java.util.Map;
 
 public class Actor {
 
-    private final Transform transform;
-    private Shape shape;
+    public final Transform transform;
+    public Shape shape;
     private Map<ComponentType, Component> components = new EnumMap<>(ComponentType.class);
 
     public Actor() {

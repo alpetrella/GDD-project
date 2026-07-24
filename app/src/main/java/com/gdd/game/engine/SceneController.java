@@ -56,15 +56,10 @@ public class SceneController {
 
         // TEST
         actors = new ArrayList<>();
-        initPhysicsActors();
         initActors();
     }
 
     public void initActors() {
-
-    }
-
-    public void initPhysicsActors() {
 
         Actor a;
         float width, height, radius;
@@ -88,22 +83,6 @@ public class SceneController {
             actors.add(a);
         }
 
-
-        physicsParams.shapeType = PhysicsParams.ShapeType.CIRCLE;
-        radius = 0.25f;
-        // TEST: physic actors [box]
-        for (int i = 5; i <= 10 ; i++) {
-            a = new Actor();
-            a.setShape(new Shape.Circle(radius));
-            a.addComponent(new PrimitiveDrawable(
-                    PrimitiveDrawable.Kind.CIRCLE, Color.RED, true));
-            physicsParams.x = -1.5f * i;
-            physicsParams.y = -5f;
-            physicsParams.direction = 15f * i;
-            physicsParams.radius = radius;
-            a.addComponent(sPhysics.createComponent(physicsParams));
-            actors.add(a);
-        }
     }
 
 
@@ -112,6 +91,7 @@ public class SceneController {
     // ------------------------------------------------------------------
 
     public synchronized void processInput(Input.TouchEvent event)  {
+
         sInput.processInput(event);
     }
 
@@ -119,7 +99,6 @@ public class SceneController {
 
         // update physics
         sPhysics.step(deltaTime);
-        // sync transform-physics
         sPhysics.syncTransform(actors);
     }
 

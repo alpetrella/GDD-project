@@ -18,7 +18,6 @@ import java.util.List;
 public class RenderManager {
 
     // allocate once and used for every draw
-    // scratch riusati, MAI allocati nel loop
     private final ScreenParams scratchTransform = new ScreenParams();
     private final RectF scratchDst = new RectF();
 
@@ -32,8 +31,6 @@ public class RenderManager {
         if(canvas == null || actors == null)
             return;
 
-        // for(Actor a : actors) // sconsigliato per un gioco
-
         int n = actors.size();
         for(int i=0; i<n; i++)  {
 
@@ -42,8 +39,7 @@ public class RenderManager {
             if(dc == null)
                 continue;
 
-            Transform transform = a.getTransform();
-            Shape shape = a.getShape();
+            Shape shape = a.shape;
             if(shape == null)
                 continue;
 
@@ -62,6 +58,7 @@ public class RenderManager {
                 continue;
             }
 
+            Transform transform = a.transform;
             // 1. CULLING
             if (!camera.isVisible(transform.x, transform.y, boundHalfW, boundHalfH)) {
                 continue;
@@ -75,7 +72,8 @@ public class RenderManager {
             float rotationDeg = (float) Math.toDegrees(transform.angle)
                     + dc.getVisualAngleOffsetDeg(); // serve +90f?
 
-            scratchTransform.set(screenX, screenY, halfWidthPx, halfHeightPx, rotationDeg, halfWidthPx);
+            scratchTransform.set(screenX, screenY, halfWidthPx, halfHeightPx,
+                    rotationDeg, halfWidthPx);
 
             // 3. DRAW ACTOR
             dc.draw(canvas, scratchTransform, scratchDst);

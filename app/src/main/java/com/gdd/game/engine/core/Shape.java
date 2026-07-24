@@ -23,7 +23,6 @@ public abstract class Shape {
             this.height = h;
             this.halfWidth = w/2;
             this.halfHeight = h/2;
-
         }
     }
 

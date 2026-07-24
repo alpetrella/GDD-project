@@ -112,16 +112,18 @@ public class PhysicsManager {
         fdef.setShape(shape);
         fdef.setDensity(DENSITY);
         fdef.setFriction(FRICTION);
-        fdef.setRestitution(1f); // riemttere RESTITUTION
+        fdef.setRestitution(RESTITUTION);
         body.createFixture(fdef);
 
         // **** TEST ****
+        /*
         var vec = new Vec2(
                 10 * (float) Math.cos(params.direction),
                 10 * (float) Math.sin(params.direction)
         );
         body.setLinearVelocity(vec);
         vec.delete();
+        */
 
         shape.delete();
         fdef.delete();
@@ -129,6 +131,7 @@ public class PhysicsManager {
 
         return new PhysicsComponent(body);
     }
+
 
     // ------------------------------------------------------------------
     // Utils
@@ -180,14 +183,11 @@ public class PhysicsManager {
 
         int n = actors.size();
         for(int i=0; i<n; i++)  {
-            Actor a = actors.get(i);
-            Transform t = a.getTransform();
 
+            Actor a = actors.get(i);
             PhysicsComponent pc = (PhysicsComponent) a.getComponent(ComponentType.PHYSICS);
             if(pc != null) {
-                t.x = pc.getX();
-                t.y = pc.getY();
-                t.angle = pc.getAngle();
+                pc.syncTransform();
             }
         }
     }
