@@ -2,17 +2,15 @@ package com.gdd.game.engine;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 
 import com.badlogic.androidgames.framework.Input;
 import com.gdd.game.Game;
 import com.gdd.game.Settings;
-import com.gdd.game.engine.components.ComponentType;
-import com.gdd.game.engine.components.PhysicsComponent;
 import com.gdd.game.engine.components.PrimitiveDrawable;
 import com.gdd.game.engine.core.Actor;
 import com.gdd.game.engine.core.Shape;
-import com.gdd.game.engine.core.Transform;
+import com.gdd.game.engine.factories.AntFactory;
+import com.gdd.game.engine.factories.EnemyFactory;
 import com.gdd.game.engine.managers.AudioManager;
 import com.gdd.game.engine.managers.InputManager;
 import com.gdd.game.engine.managers.PhysicsManager;
@@ -27,11 +25,18 @@ public class SceneController {
     private Game game;
     private Camera camera;
 
+    // MANAGERS
     private InputManager sInput;
     private RenderManager sGraphics;
     private AudioManager sAudio;
     private PhysicsManager sPhysics;
 
+    // FACTORIES
+    private AntFactory antFactory;
+    private EnemyFactory enemyFactory;
+
+    // ACTORS
+    private long nextId = 0;
     private List<Actor> actors;
 
 
@@ -48,11 +53,16 @@ public class SceneController {
                 Settings.fbufferWidth, Settings.fbufferHeight // pixel, fisso, lo conosci già
         );
 
+        // MANAGERS
         sInput = new InputManager(camera);
         sGraphics = new RenderManager();
         sAudio = new AudioManager();
         sPhysics = new PhysicsManager(Settings.worldWidth, Settings.worldHeight);
         sPhysics.setGravity(0, 5);
+
+        // FACTORIES
+        antFactory = new AntFactory(sPhysics);
+        enemyFactory = new EnemyFactory(sPhysics);
 
         // TEST
         actors = new ArrayList<>();
@@ -61,26 +71,18 @@ public class SceneController {
 
     public void initActors() {
 
-        Actor a;
-        float width, height, radius;
-        PhysicsParams physicsParams = new PhysicsParams();
-        physicsParams.bodyType = BodyType.dynamicBody;
-        physicsParams.shapeType = PhysicsParams.ShapeType.BOX;
+        Actor ant;
+        for (int i = 1; i <= 5; i++) {
+            ant = new Actor(nextId++);
+            ant = antFactory.makeAnt(ant, 1.5f * i, -5f, 15f * i);
+            actors.add(ant);
+        }
 
-        // TEST: physic actors [box]
-        width = 0.5f; height = 0.5f;
-        for (int i = 0; i <= 5; i++) {
-            a = new Actor();
-            a.setShape(new Shape.Box(width, height));
-            a.addComponent(new PrimitiveDrawable(
-                    PrimitiveDrawable.Kind.BOX, Color.BLUE, true));
-            physicsParams.x = 1.5f * i;
-            physicsParams.y = -5f;
-            physicsParams.direction = 15f * i;
-            physicsParams.width = width;
-            physicsParams.height = height;
-            a.addComponent(sPhysics.createComponent(physicsParams));
-            actors.add(a);
+        Actor wasp;
+        for (int i = 1; i <= 5; i++) {
+            wasp = new Actor(nextId++);
+            wasp = enemyFactory.makeWasp(wasp,-1.5f * i, -8f, 10f * i);
+            actors.add(wasp);
         }
 
     }
@@ -91,12 +93,10 @@ public class SceneController {
     // ------------------------------------------------------------------
 
     public synchronized void processInput(Input.TouchEvent event)  {
-
         sInput.processInput(event);
     }
 
     public synchronized void update(float deltaTime)  {
-
         // update physics
         sPhysics.step(deltaTime);
         sPhysics.syncTransform(actors);

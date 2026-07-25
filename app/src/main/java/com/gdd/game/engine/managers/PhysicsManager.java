@@ -1,22 +1,20 @@
 package com.gdd.game.engine.managers;
 
-import com.gdd.game.engine.PhysicsParams;
+import com.gdd.game.engine.PhysicsBodyDef;
 import com.gdd.game.engine.components.ComponentType;
 import com.gdd.game.engine.components.PhysicsComponent;
 import com.gdd.game.engine.core.Actor;
-import com.gdd.game.engine.core.Transform;
+import com.gdd.game.engine.factories.IPhysicsFactory;
 import com.google.fpl.liquidfun.BodyDef;
-import com.google.fpl.liquidfun.BodyType;
 import com.google.fpl.liquidfun.CircleShape;
 import com.google.fpl.liquidfun.FixtureDef;
 import com.google.fpl.liquidfun.PolygonShape;
 import com.google.fpl.liquidfun.Shape;
-import com.google.fpl.liquidfun.Vec2;
 import com.google.fpl.liquidfun.World;
 
 import java.util.List;
 
-public class PhysicsManager {
+public class PhysicsManager implements IPhysicsFactory {
 
     // Parameters for world simulation
     private static final int VELOCITY_ITERATIONS = 8;
@@ -42,7 +40,7 @@ public class PhysicsManager {
         this.world = new World(0, 0);  // gravity vector
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
-        createBoundaries();
+        addWorldBoundaries();
     }
 
 
@@ -77,16 +75,17 @@ public class PhysicsManager {
       direzione
       shape = circle (+ radius) or polygon (+ size)
      */
-    public PhysicsComponent createComponent(PhysicsParams params) {
+    @Override
+    public PhysicsComponent createComponent(PhysicsBodyDef def) {
 
-        if(params == null)
+        if(def == null)
             return null;
 
         // BODY DEF
         BodyDef bdef = new BodyDef();
-        bdef.setType( params.bodyType );
-        bdef.setPosition( params.x, params.y);
-        bdef.setAngle( params.direction );
+        bdef.setType( def.bodyType );
+        bdef.setPosition( def.x, def.y);
+        bdef.setAngle( def.direction );
         bdef.setAngularDamping(0);
         bdef.setLinearDamping(0);
         bdef.setFixedRotation(true);
@@ -97,13 +96,13 @@ public class PhysicsManager {
 
         // SHAPE
         Shape shape;
-        if(params.shapeType == PhysicsParams.ShapeType.CIRCLE) {
+        if(def.shapeType == PhysicsBodyDef.ShapeType.CIRCLE) {
             CircleShape circle = new CircleShape();
-            circle.setRadius( params.radius );
+            circle.setRadius( def.radius );
             shape = circle;
         } else {
             PolygonShape polygon = new PolygonShape();
-            polygon.setAsBox( params.width/2, params.height/2 );
+            polygon.setAsBox( def.width/2, def.height/2 );
             shape = polygon;
         }
 
@@ -114,16 +113,6 @@ public class PhysicsManager {
         fdef.setFriction(FRICTION);
         fdef.setRestitution(RESTITUTION);
         body.createFixture(fdef);
-
-        // **** TEST ****
-        /*
-        var vec = new Vec2(
-                10 * (float) Math.cos(params.direction),
-                10 * (float) Math.sin(params.direction)
-        );
-        body.setLinearVelocity(vec);
-        vec.delete();
-        */
 
         shape.delete();
         fdef.delete();
@@ -137,7 +126,7 @@ public class PhysicsManager {
     // Utils
     // ------------------------------------------------------------------
 
-    private void createBoundaries() {
+    private void addWorldBoundaries() {
 
         float THICKNESS = 1f;
         float xmax = worldWidth / 2;

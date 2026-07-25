@@ -2,7 +2,7 @@ package com.gdd.game.engine;
 
 import com.google.fpl.liquidfun.BodyType;
 
-public class PhysicsParams {
+public class PhysicsBodyDef {
 
     public enum ShapeType { CIRCLE, BOX }
 

@@ -8,22 +8,24 @@ import java.util.Map;
 
 public class Actor {
 
+    public long id;
     public final Transform transform;
     public Shape shape;
     private Map<ComponentType, Component> components = new EnumMap<>(ComponentType.class);
 
-    public Actor() {
+    public Actor(long id) {
+        this.id = id;
         transform = new Transform();
     }
 
-    public Actor(float x, float y) {
-        this();
+    public Actor(long id, float x, float y) {
+        this(id);
         transform.x = x;
         transform.y = y;
     }
 
-    public Actor(float x, float y, float angle) {
-        this(x,y);
+    public Actor(long id, float x, float y, float angle) {
+        this(id, x,y);
         transform.angle = angle;
     }
 
