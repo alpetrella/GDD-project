@@ -5,42 +5,38 @@ import android.graphics.Color;
 import com.gdd.game.engine.PhysicsBodyDef;
 import com.gdd.game.engine.actors.Actor;
 import com.gdd.game.engine.actors.ActorTag;
-import com.gdd.game.engine.actors.Faction;
-import com.gdd.game.engine.actors.Species;
-import com.gdd.game.engine.components.AliveComponent;
 import com.gdd.game.engine.components.PrimitiveDrawable;
 import com.google.fpl.liquidfun.BodyType;
 
-public class InsectFactory {
+public class FoodFactory {
 
     private final IPhysicsFactory physicsFactory;
-    private final float width = 0.5f, height = 0.5f;
-    private final int waspColor = Color.RED;
+    private final float width = 0.8f, height = 0.8f;
+    private final int color = Color.MAGENTA;
 
-    public InsectFactory(IPhysicsFactory physicsFactory) {
 
+    public FoodFactory(IPhysicsFactory physicsFactory) {
         this.physicsFactory = physicsFactory;
     }
 
 
-    public void makeWasp(Actor a, float x, float y, float direction) {
+    public void makeFood(Actor a, float x, float y, float direction) {
 
         if(physicsFactory == null || a == null)
             return;
 
-        a.tag = ActorTag.INSECT;
+        a.tag = ActorTag.FOOD;
 
         a.transform.halfWidth = width/2;
         a.transform.halfHeight = height/2;
 
-        AliveComponent alive = new AliveComponent(Species.WASP, Faction.ENEMY);
-        a.addComponent(alive);
-
         a.addComponent(new PrimitiveDrawable(
-                PrimitiveDrawable.Kind.BOX, waspColor, true));
+                PrimitiveDrawable.Kind.BOX, color, true));
 
         addPhysics(a, x, y, direction);
     }
+
+
 
     private void addPhysics(Actor a, float x, float y, float direction) {
 
@@ -52,7 +48,6 @@ public class InsectFactory {
         physicsBodyDef.direction = direction;
         physicsBodyDef.width = width;
         physicsBodyDef.height = height;
-
         a.addComponent(physicsFactory.createComponent(physicsBodyDef));
     }
 }

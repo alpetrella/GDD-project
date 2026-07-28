@@ -11,33 +11,30 @@ import com.gdd.game.engine.components.AliveComponent;
 import com.gdd.game.engine.components.PrimitiveDrawable;
 import com.google.fpl.liquidfun.BodyType;
 
-public class InsectFactory {
+public class NestFactory {
 
     private final IPhysicsFactory physicsFactory;
-    private final float width = 0.5f, height = 0.5f;
-    private final int waspColor = Color.RED;
+    private final float width = 2.0f, height = 2.0f;
+    private final int color = Color.DKGRAY;
 
-    public InsectFactory(IPhysicsFactory physicsFactory) {
 
+    public NestFactory(IPhysicsFactory physicsFactory) {
         this.physicsFactory = physicsFactory;
     }
 
 
-    public void makeWasp(Actor a, float x, float y, float direction) {
+    public void makeNest(Actor a, float x, float y, float direction) {
 
         if(physicsFactory == null || a == null)
             return;
 
-        a.tag = ActorTag.INSECT;
+        a.tag = ActorTag.NEST;
 
         a.transform.halfWidth = width/2;
         a.transform.halfHeight = height/2;
 
-        AliveComponent alive = new AliveComponent(Species.WASP, Faction.ENEMY);
-        a.addComponent(alive);
-
         a.addComponent(new PrimitiveDrawable(
-                PrimitiveDrawable.Kind.BOX, waspColor, true));
+                PrimitiveDrawable.Kind.BOX, color, true));
 
         addPhysics(a, x, y, direction);
     }
@@ -45,14 +42,13 @@ public class InsectFactory {
     private void addPhysics(Actor a, float x, float y, float direction) {
 
         PhysicsBodyDef physicsBodyDef = new PhysicsBodyDef();
-        physicsBodyDef.bodyType = BodyType.dynamicBody;
+        physicsBodyDef.bodyType = BodyType.staticBody;
         physicsBodyDef.shapeType = PhysicsBodyDef.ShapeType.BOX;
         physicsBodyDef.x = x;
         physicsBodyDef.y = y;
         physicsBodyDef.direction = direction;
         physicsBodyDef.width = width;
         physicsBodyDef.height = height;
-
         a.addComponent(physicsFactory.createComponent(physicsBodyDef));
     }
 }

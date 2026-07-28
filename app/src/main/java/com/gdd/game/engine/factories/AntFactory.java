@@ -11,19 +11,18 @@ import com.gdd.game.engine.components.AliveComponent;
 import com.gdd.game.engine.components.PrimitiveDrawable;
 import com.google.fpl.liquidfun.BodyType;
 
-public class InsectFactory {
+public class AntFactory {
 
     private final IPhysicsFactory physicsFactory;
     private final float width = 0.5f, height = 0.5f;
-    private final int waspColor = Color.RED;
+    private final int antColor = Color.BLUE;
 
-    public InsectFactory(IPhysicsFactory physicsFactory) {
 
+    public AntFactory(IPhysicsFactory physicsFactory) {
         this.physicsFactory = physicsFactory;
     }
 
-
-    public void makeWasp(Actor a, float x, float y, float direction) {
+    public void makeAnt(Actor a, float x, float y, float direction) {
 
         if(physicsFactory == null || a == null)
             return;
@@ -33,14 +32,18 @@ public class InsectFactory {
         a.transform.halfWidth = width/2;
         a.transform.halfHeight = height/2;
 
-        AliveComponent alive = new AliveComponent(Species.WASP, Faction.ENEMY);
+        AliveComponent alive = new AliveComponent(Species.ANT, Faction.ALLY);
+        alive.hp = 50;
+        alive.damage = 10;
         a.addComponent(alive);
 
         a.addComponent(new PrimitiveDrawable(
-                PrimitiveDrawable.Kind.BOX, waspColor, true));
+                PrimitiveDrawable.Kind.BOX, antColor, true));
 
         addPhysics(a, x, y, direction);
     }
+
+
 
     private void addPhysics(Actor a, float x, float y, float direction) {
 
@@ -52,7 +55,6 @@ public class InsectFactory {
         physicsBodyDef.direction = direction;
         physicsBodyDef.width = width;
         physicsBodyDef.height = height;
-
         a.addComponent(physicsFactory.createComponent(physicsBodyDef));
     }
 }
