@@ -1,21 +1,16 @@
 package com.gdd.game.engine;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 
 import com.badlogic.androidgames.framework.Input;
 import com.gdd.game.Game;
 import com.gdd.game.Settings;
-import com.gdd.game.engine.components.PrimitiveDrawable;
-import com.gdd.game.engine.core.Actor;
-import com.gdd.game.engine.core.Shape;
-import com.gdd.game.engine.factories.AntFactory;
-import com.gdd.game.engine.factories.EnemyFactory;
+import com.gdd.game.engine.actors.Actor;
+import com.gdd.game.engine.factories.InsectFactory;
 import com.gdd.game.engine.managers.AudioManager;
 import com.gdd.game.engine.managers.InputManager;
 import com.gdd.game.engine.managers.PhysicsManager;
 import com.gdd.game.engine.managers.RenderManager;
-import com.google.fpl.liquidfun.BodyType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +27,7 @@ public class SceneController {
     private PhysicsManager sPhysics;
 
     // FACTORIES
-    private AntFactory antFactory;
-    private EnemyFactory enemyFactory;
+    private InsectFactory insectFactory;
 
     // ACTORS
     private long nextId = 0;
@@ -58,11 +52,9 @@ public class SceneController {
         sGraphics = new RenderManager();
         sAudio = new AudioManager();
         sPhysics = new PhysicsManager(Settings.worldWidth, Settings.worldHeight);
-        sPhysics.setGravity(0, 5);
 
         // FACTORIES
-        antFactory = new AntFactory(sPhysics);
-        enemyFactory = new EnemyFactory(sPhysics);
+        insectFactory = new InsectFactory(sPhysics);
 
         // TEST
         actors = new ArrayList<>();
@@ -74,14 +66,14 @@ public class SceneController {
         Actor ant;
         for (int i = 1; i <= 5; i++) {
             ant = new Actor(nextId++);
-            ant = antFactory.makeAnt(ant, 1.5f * i, -5f, 15f * i);
+            ant = insectFactory.makeAnt(ant, 1.5f * i, -5f, 15f * i);
             actors.add(ant);
         }
 
         Actor wasp;
         for (int i = 1; i <= 5; i++) {
             wasp = new Actor(nextId++);
-            wasp = enemyFactory.makeWasp(wasp,-1.5f * i, -8f, 10f * i);
+            wasp = insectFactory.makeWasp(wasp,-1.5f * i, -8f, 10f * i);
             actors.add(wasp);
         }
 

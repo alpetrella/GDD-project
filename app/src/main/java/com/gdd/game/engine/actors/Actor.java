@@ -1,4 +1,8 @@
-package com.gdd.game.engine.core;
+package com.gdd.game.engine.actors;
+
+import static com.gdd.game.engine.actors.ActorTag.EMPTY;
+
+import android.nfc.Tag;
 
 import com.gdd.game.engine.components.Component;
 import com.gdd.game.engine.components.ComponentType;
@@ -8,27 +12,19 @@ import java.util.Map;
 
 public class Actor {
 
-    public long id;
+    public final long id;
+    public ActorTag tag = EMPTY;
+
     public final Transform transform;
-    public Shape shape;
     private Map<ComponentType, Component> components = new EnumMap<>(ComponentType.class);
 
+    /*
+     * Constructor.
+     */
     public Actor(long id) {
         this.id = id;
         transform = new Transform();
     }
-
-    public Actor(long id, float x, float y) {
-        this(id);
-        transform.x = x;
-        transform.y = y;
-    }
-
-    public Actor(long id, float x, float y, float angle) {
-        this(id, x,y);
-        transform.angle = angle;
-    }
-
 
     public void addComponent(Component c) {
         c.setOwner(this);
@@ -42,8 +38,4 @@ public class Actor {
     public Transform getTransform() {
         return transform;
     }
-
-    public Shape getShape() { return shape; }
-
-    public void setShape(Shape shape) { this.shape = shape; }
 }

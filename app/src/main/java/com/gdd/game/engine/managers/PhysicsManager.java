@@ -3,7 +3,7 @@ package com.gdd.game.engine.managers;
 import com.gdd.game.engine.PhysicsBodyDef;
 import com.gdd.game.engine.components.ComponentType;
 import com.gdd.game.engine.components.PhysicsComponent;
-import com.gdd.game.engine.core.Actor;
+import com.gdd.game.engine.actors.Actor;
 import com.gdd.game.engine.factories.IPhysicsFactory;
 import com.google.fpl.liquidfun.BodyDef;
 import com.google.fpl.liquidfun.CircleShape;

@@ -6,6 +6,7 @@ public class PhysicsComponent extends Component {
 
     public Body body;
 
+
     @Override
     public final ComponentType type() {
         return ComponentType.PHYSICS;
