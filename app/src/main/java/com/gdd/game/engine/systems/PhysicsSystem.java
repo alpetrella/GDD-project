@@ -1,4 +1,4 @@
-package com.gdd.game.engine.managers;
+package com.gdd.game.engine.systems;
 
 import com.gdd.game.engine.PhysicsBodyDef;
 import com.gdd.game.engine.components.ComponentType;
@@ -14,7 +14,7 @@ import com.google.fpl.liquidfun.World;
 
 import java.util.List;
 
-public class PhysicsManager implements IPhysicsFactory {
+public class PhysicsSystem implements IPhysicsFactory {
 
     // Parameters for world simulation
     private static final int VELOCITY_ITERATIONS = 8;
@@ -36,7 +36,7 @@ public class PhysicsManager implements IPhysicsFactory {
     /*
      * Constructor.
      */
-    public PhysicsManager(float worldWidth, float worldHeight) {
+    public PhysicsSystem(float worldWidth, float worldHeight) {
         this.world = new World(0, 0);  // gravity vector
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
@@ -168,7 +168,10 @@ public class PhysicsManager implements IPhysicsFactory {
     }
 
 
-    public void syncTransform(List<Actor> actors) {
+    /*
+     * Sync transform and physics
+     */
+    public void sync(List<Actor> actors) {
 
         int n = actors.size();
         for(int i=0; i<n; i++)  {

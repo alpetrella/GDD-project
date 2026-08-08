@@ -1,4 +1,4 @@
-package com.gdd.game.engine.managers;
+package com.gdd.game.engine.systems;
 
 import android.graphics.Canvas;
 import android.graphics.RectF;
@@ -12,14 +12,14 @@ import com.gdd.game.engine.components.DrawableComponent;
 
 import java.util.List;
 
-public class RenderManager {
+public class RenderSystem {
 
     // allocate once and used for every draw
     private final ScreenParams scratchTransform = new ScreenParams();
     private final RectF scratchDst = new RectF();
 
 
-    public RenderManager() {
+    public RenderSystem() {
     }
 
 

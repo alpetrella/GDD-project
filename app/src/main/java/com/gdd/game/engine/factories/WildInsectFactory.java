@@ -11,13 +11,13 @@ import com.gdd.game.engine.components.AliveComponent;
 import com.gdd.game.engine.components.PrimitiveDrawable;
 import com.google.fpl.liquidfun.BodyType;
 
-public class InsectFactory {
+public class WildInsectFactory {
 
     private final IPhysicsFactory physicsFactory;
     private final float width = 0.5f, height = 0.5f;
     private final int waspColor = Color.RED;
 
-    public InsectFactory(IPhysicsFactory physicsFactory) {
+    public WildInsectFactory(IPhysicsFactory physicsFactory) {
 
         this.physicsFactory = physicsFactory;
     }
@@ -33,7 +33,7 @@ public class InsectFactory {
         a.transform.halfWidth = width/2;
         a.transform.halfHeight = height/2;
 
-        AliveComponent alive = new AliveComponent(Species.WASP, Faction.ENEMY);
+        AliveComponent alive = new AliveComponent(Species.WASP, Faction.HOSTILE);
         a.addComponent(alive);
 
         a.addComponent(new PrimitiveDrawable(

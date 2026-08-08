@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import com.badlogic.androidgames.framework.Input;
 import com.badlogic.androidgames.framework.impl.TouchHandler;
 import com.gdd.game.engine.Box;
-import com.gdd.game.engine.SceneController;
 import com.gdd.game.ui.Button;
 import com.gdd.game.ui.UIController;
 import com.gdd.game.ui.WidgetGroup;
@@ -28,7 +27,7 @@ public class Game {
 
     // Controller
     private final UIController uiController;
-    private SceneController sceneController;
+    private GameWorld sceneController;
 
     public final Box worldSize, // physics world's size (in meters)
             screenSize, // smartphone's screen size (in pixel)
@@ -52,7 +51,7 @@ public class Game {
         cameraView = new Box(worldSize); // di default vede l'intero mondo
         canvas = new Canvas(frameBuffer);
 
-        sceneController = new SceneController(this);
+        sceneController = new GameWorld(this);
 
         uiController = new UIController();
         initUI();

@@ -32,7 +32,7 @@ public class AntFactory {
         a.transform.halfWidth = width/2;
         a.transform.halfHeight = height/2;
 
-        AliveComponent alive = new AliveComponent(Species.ANT, Faction.ALLY);
+        AliveComponent alive = new AliveComponent(Species.ANT, Faction.PLAYER);
         alive.hp = 50;
         alive.damage = 10;
         a.addComponent(alive);
