@@ -7,12 +7,12 @@ import android.graphics.RectF;
 
 import com.gdd.game.engine.ScreenParams;
 
-public class BitmapDrawable extends DrawableComponent {
+public class BitmapRenderComp extends RenderComponent {
 
     private final Bitmap bitmap;
-    private final Paint paint; // con FILTER_BITMAP_FLAG
+    private final Paint paint;
 
-    public BitmapDrawable(Bitmap bitmap) {
+    public BitmapRenderComp(Bitmap bitmap) {
         this.bitmap = bitmap;
         this.paint = new Paint(Paint.FILTER_BITMAP_FLAG);
     }

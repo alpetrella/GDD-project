@@ -8,7 +8,7 @@ import com.gdd.game.engine.actors.ActorTag;
 import com.gdd.game.engine.actors.Faction;
 import com.gdd.game.engine.actors.Species;
 import com.gdd.game.engine.components.AliveComponent;
-import com.gdd.game.engine.components.PrimitiveDrawable;
+import com.gdd.game.engine.components.BoxRenderComp;
 import com.google.fpl.liquidfun.BodyType;
 
 public class AntFactory {
@@ -37,8 +37,7 @@ public class AntFactory {
         alive.damage = 10;
         a.addComponent(alive);
 
-        a.addComponent(new PrimitiveDrawable(
-                PrimitiveDrawable.Kind.BOX, antColor, true));
+        a.addComponent(new BoxRenderComp(antColor, true));
 
         addPhysics(a, x, y, direction);
     }

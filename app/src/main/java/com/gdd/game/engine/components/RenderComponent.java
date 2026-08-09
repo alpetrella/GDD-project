@@ -1,12 +1,11 @@
 package com.gdd.game.engine.components;
 
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.RectF;
 
 import com.gdd.game.engine.ScreenParams;
 
-public abstract class DrawableComponent extends Component {
+public abstract class RenderComponent extends Component {
 
     protected float visualAngleOffsetDeg = 0f;
 

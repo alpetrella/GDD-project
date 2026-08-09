@@ -5,10 +5,7 @@ import android.graphics.Color;
 import com.gdd.game.engine.PhysicsBodyDef;
 import com.gdd.game.engine.actors.Actor;
 import com.gdd.game.engine.actors.ActorTag;
-import com.gdd.game.engine.actors.Faction;
-import com.gdd.game.engine.actors.Species;
-import com.gdd.game.engine.components.AliveComponent;
-import com.gdd.game.engine.components.PrimitiveDrawable;
+import com.gdd.game.engine.components.BoxRenderComp;
 import com.google.fpl.liquidfun.BodyType;
 
 public class NestFactory {
@@ -33,8 +30,7 @@ public class NestFactory {
         a.transform.halfWidth = width/2;
         a.transform.halfHeight = height/2;
 
-        a.addComponent(new PrimitiveDrawable(
-                PrimitiveDrawable.Kind.BOX, color, true));
+        a.addComponent(new BoxRenderComp(color, true));
 
         addPhysics(a, x, y, direction);
     }
