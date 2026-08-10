@@ -5,21 +5,17 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
-import com.badlogic.androidgames.framework.Input;
-
 public class Button extends Widget {
 
     public interface OnClickListener {
         void onClick(Button button);
     }
 
-    // public enum State { IDLE, PRESSED, PRESSED_OUTSIDE }
-    public enum State { IDLE, PRESSED, DISABLED }
+    public enum State { IDLE, PRESSED }
 
     private State state = State.IDLE;
-    private int owningPointer = -1; // il pointer che "possiede" il button
+    private int owningPointer = -1;
     private OnClickListener listener;
-
 
     // ***** DRAW *****
     private String label;
@@ -27,8 +23,6 @@ public class Button extends Widget {
     private final Paint paintPressed;
     private final Paint paintDisabled;
     private final Paint textPaint;
-
-    // ***** DRAW *****
     private Bitmap bitmap;
     private final RectF dst = new RectF();
 
@@ -41,6 +35,9 @@ public class Button extends Widget {
         this(x, y, width, height, "");
     }
 
+    /*
+     * Costruttore.
+     */
     public Button(float x, float y, float width, float height, String label) {
         super(x, y, width, height);
         this.label = label;
@@ -60,10 +57,66 @@ public class Button extends Widget {
         textPaint.setTextAlign(Paint.Align.CENTER);
     }
 
+    // ***************************************
+    //  Rendering
+    // ***************************************
 
+    @Override
+    public void draw(Canvas canvas) {
+        Paint background = touchable != Touchable.ENABLED
+                ? paintDisabled
+                : (state == State.PRESSED ? paintPressed : paintUp);
+
+        canvas.drawRoundRect(x, y, x + width, y + height, 12f, 12f, background);
+
+        if (label != null) {
+            float cx = x + width / 2f;
+            float cy = y + height / 2f - (textPaint.ascent() + textPaint.descent()) / 2f;
+            canvas.drawText(label, cx, cy, textPaint);
+        }
+    }
+
+    // ***************************************
+    //  Input
+    // ***************************************
+
+    @Override
+    public boolean touchDown(float x, float y, int pointer) {
+        if (touchable != Touchable.ENABLED || owningPointer != -1) {
+            return false;
+        }
+        owningPointer = pointer;
+        state = State.PRESSED;
+        return true;
+    }
+
+    @Override
+    public void touchDragged(float x, float y, int pointer) {
+        if (pointer != owningPointer) return;
+        state = contains(x, y) ? State.PRESSED : State.IDLE;
+    }
+
+    @Override
+    public void touchUp(float x, float y, int pointer) {
+        if (pointer != owningPointer) return;
+        boolean wasInsideOnRelease = contains(x, y);
+        owningPointer = -1;
+        state = State.IDLE;
+        if (wasInsideOnRelease && listener != null) {
+            listener.onClick(this);
+        }
+    }
+
+    @Override
+    public void touchCancelled(int pointer) {
+        if (pointer == owningPointer) {
+            owningPointer = -1;
+            state = State.IDLE;
+        }
+    }
 
     // ********************************
-    //          Getter / Setter
+    //  Getter / Setter
     // ********************************
 
     public State getState() { return state; }
@@ -77,83 +130,11 @@ public class Button extends Widget {
     public void setOnClickListener(OnClickListener listener) { this.listener = listener; }
 
     @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        if (!enabled) {
+    public void setTouchable(Touchable touchable) {
+        super.setTouchable(touchable);
+        if (touchable != Touchable.ENABLED) {
             owningPointer = -1;
             state = State.IDLE;
         }
     }
-
-
-    // ***************************************
-    //            Ciclo di vita
-    // ***************************************
-
-    @Override
-    public void update(float deltaTime) {
-
-    }
-
-    @Override
-    public void draw(Canvas canvas) {
-        Paint background = !enabled
-                ? paintDisabled
-                : (state == State.PRESSED ? paintPressed : paintUp);
-
-        canvas.drawRoundRect(x, y, x + width, y + height, 12f, 12f, background);
-
-        if (label != null) {
-            float cx = x + width / 2f;
-            float cy = y + height / 2f - (textPaint.ascent() + textPaint.descent()) / 2f;
-            canvas.drawText(label, cx, cy, textPaint);
-        }
-    }
-
-
-    // ***************************************
-    //         Gestione input grezzi
-    // ***************************************
-
-    @Override
-    public boolean touchDown(float px, float py, int pointer) {
-        if (!enabled || owningPointer != -1) {
-            return false;
-        }
-        owningPointer = pointer;
-        state = State.PRESSED;
-        return true;
-    }
-
-    @Override
-    public void touchDragged(float px, float py, int pointer) {
-        if (pointer != owningPointer) return;
-        // Se il dito esce dall'area il bottone si "spegne" visivamente ma
-        // resta posseduto: se il dito rientra prima del touchUp torna PRESSED,
-        // esattamente come il comportamento standard dei bottoni Android.
-        state = contains(px, py) ? State.PRESSED : State.IDLE;
-    }
-
-    @Override
-    public void touchUp(float px, float py, int pointer) {
-        if (pointer != owningPointer) return;
-        boolean wasInsideOnRelease = contains(px, py);
-        owningPointer = -1;
-        state = State.IDLE;
-        if (wasInsideOnRelease && listener != null) {
-            listener.onClick(this);
-        }
-    }
-
 }
-
-
-/*
-    @Override
-    public void draw(Canvas canvas, Paint paint) {
-        if (!visible) return;
-
-        canvas.drawBitmap(bitmap, null, dst, paint);
-        // canvas.drawRect(x, y, x+width, y+height, paint);
-    }
-*/

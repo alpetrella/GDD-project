@@ -53,7 +53,7 @@ public class Game {
 
         sceneController = new GameWorld(this);
 
-        uiController = new UIController();
+        uiController = new UIController(Settings.fbufferWidth, Settings.fbufferHeight);
         initUI();
     }
 
@@ -65,13 +65,18 @@ public class Game {
     public void initUI() {
 
         WidgetGroup mainLayout = new WidgetGroupImp(0, 0, fbufferWidth, fbufferHeight);
+
         Button pauseButton = new Button(50, 50, 200, 100, "PAUSE");
-        mainLayout.addWidget(pauseButton);
-        uiController.setMainLayout(mainLayout);
+        mainLayout.addChild(pauseButton);
+        uiController.setRoot(mainLayout);
+
+        Button quackButton = new Button(900, 500, 300, 100, "A");
+        mainLayout.addChild(quackButton);
+        uiController.setRoot(mainLayout);
 
         WidgetGroup pauseLayout = new WidgetGroupImp(0, 0, fbufferWidth, fbufferHeight);
         Button resumeButton = new Button(500, 500, 200, 100, "RESUME");
-        pauseLayout.addWidget(resumeButton);
+        pauseLayout.addChild(resumeButton);
 
         pauseButton.setOnClickListener(b -> {
             uiController.showPopup(pauseLayout);

@@ -1,36 +1,18 @@
 package com.gdd.game.ui;
 
 import android.graphics.Canvas;
-import android.graphics.Paint;
+import android.util.SparseArray;
 
 import com.badlogic.androidgames.framework.Input;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-/**
- * UIManager coordina l'intero ciclo di vita della UI:
- *  - un "main layout" sempre presente durante la partita
- *  - uno stack di "popup layout" (pausa, conferma uscita, risultato...)
- *  - draw/update di tutto quanto
- *  - routing dell'input grezzo (Input.TouchEvent) verso i widget,
- *    restituendo al chiamante gli eventi NON consumati, da passare
- *    alla scena sottostante (scroll/zoom/gameplay).
- *
- * Policy di possesso del touch: la UI gestisce AL MASSIMO UN pointer alla
- * volta. Se un TOUCH_DOWN colpisce un widget mentre la UI non sta già
- * gestendo un altro dito, quel pointer id viene "posseduto" fino al
- * relativo TOUCH_UP: tutti i TOUCH_DRAGGED/TOUCH_UP con lo stesso id
- * vanno dritti al widget posseduto (niente hit-test ripetuto). Se la UI
- * possiede già un pointer, i tocchi di altre dita passano direttamente
- * alla scena: così un pinch-to-zoom a due dita convive con un bottone
- * premuto senza bisogno di logica aggiuntiva.
- *
- * Un popup "modale" blocca comunque il touch anche quando non colpisce
- * nessun widget preciso (es. si tocca uno spazio vuoto del pannello
- * pausa): l'evento viene consumato lo stesso, per non far scivolare il
- * dito sulla scena sotto mentre il gioco è in pausa.
- */
+
 public class UIController {
 
     private static final int NO_POINTER = -1;
@@ -45,74 +27,49 @@ public class UIController {
         }
     }
 
+    private float screenW, screenH;
+
+    private WidgetGroup root;
     private final List<PopupEntry> popups = new ArrayList<>();
-    private WidgetGroup mainLayout;
 
-    // Stato del pointer attualmente posseduto dalla UI (al massimo uno).
-    private int activePointer = NO_POINTER;
-    private Widget activeWidget = null; // null = pointer posseduto solo per bloccare un popup modale
+    private final SparseArray<Widget> pointerOwners = new SparseArray<>(); // pointer posseduti
+    private final Set<Integer> modalBlockedPointers = new HashSet<>(); // pointer bloccati da popup modale senza widget cliccato
 
 
-    // [NON SERVE PER ORA] potrebbe essere utile per fare da filtro preliminare in futuro.
-    // Lista riusata ogni frame per gli eventi da restituire alla scena:
-    // evita una nuova allocazione ad ogni chiamata di processInput().
-    //private final List<Input.TouchEvent> remainingEvents = new ArrayList<>();
-
-    /**
-     * Processa la lista grezza di eventi ricevuta dal MultiTouchHandler.
-     * Restituisce gli eventi NON consumati dalla UI, da inoltrare alla
-     * scena di gioco sottostante (es. per pan/zoom della camera).
-     *
-     * La lista restituita è riusata internamente: non conservarne un
-     * riferimento oltre il frame corrente.
-     */
-    /*
-    public List<Input.TouchEvent> processInput(List<Input.TouchEvent> events) {
-        remainingEvents.clear();
-
-        int n = events.size();
-        for (int i = 0; i < n; i++) {
-            Input.TouchEvent event = events.get(i);
-            boolean consumed;
-            switch (event.type) { ... }  // come il metodo già usato sotto
-
-            if (!consumed) {
-                remainingEvents.add(event);
-            }
-        }
-        return remainingEvents;
-     }
-     */
-
-    // ------------------------------------------------------------------
-    // Configurazione layout
-    // ------------------------------------------------------------------
-
-    public void setMainLayout(WidgetGroup layout) {
-        this.mainLayout = layout;
+    public UIController(int screenW, int screenH) {
+        this.screenW = screenW;
+        this.screenH = screenH;
     }
 
-    public WidgetGroup getMainLayout() {
-        return mainLayout;
+    // ***************************************
+    //  Layout
+    // ***************************************
+
+    public void setRoot(WidgetGroup root) {
+        this.root = root;
+        root.setPosition(0, 0);
+        root.setSize(screenW, screenH);
     }
 
-    /** Mostra un popup modale (blocca input a main layout e scena). */
+    public WidgetGroup getRoot() {
+        return root;
+    }
+
     public void showPopup(WidgetGroup popup) {
         showPopup(popup, true);
     }
 
-    public void showPopup(WidgetGroup popup, boolean modal) {
-        popups.add(new PopupEntry(popup, modal));
+    public void showPopup(WidgetGroup layout, boolean modal) {
+        if (modal) cancelAllPointers();
+        popups.add(new PopupEntry(layout, modal));
     }
 
-    /** Rimuove il popup più in cima allo stack (es. bottone "resume"). */
     public void hideTopPopup() {
         if (!popups.isEmpty()) {
             popups.remove(popups.size() - 1);
         }
     }
 
-    /** Rimuove uno specifico popup ovunque si trovi nello stack. */
     public void hidePopup(WidgetGroup popup) {
         for (int i = popups.size() - 1; i >= 0; i--) {
             if (popups.get(i).layout == popup) {
@@ -130,51 +87,39 @@ public class UIController {
         return !popups.isEmpty();
     }
 
-
-    // ------------------------------------------------------------------
-    // Ciclo di vita: update / draw
-    // ------------------------------------------------------------------
-
-    // per ora non fa nulla, non so se serve. forse per i widgetgroup che fanno "layout"
-    public void update(float deltaTime) {
-        if (mainLayout != null) {
-            mainLayout.update(deltaTime);
-        }
-        int n = popups.size();
-        for (int i = 0; i < n; i++) {
-            popups.get(i).layout.update(deltaTime);
-        }
+    private WidgetGroup topLayer() {
+        if (popups.isEmpty()) return root;
+        return popups.get(popups.size() - 1).layout;
     }
 
+    private boolean isTopPopupModal() {
+        return !popups.isEmpty() && popups.get(popups.size() - 1).modal;
+    }
+
+    // ***************************************
+    //  Rendering
+    // ***************************************
+
     public void draw(Canvas canvas) {
-        if (mainLayout != null) {
-            mainLayout.draw(canvas);
+        if (root != null) {
+            root.draw(canvas);
         }
 
         int n = popups.size();
         for (int i = 0; i < n; i++) {
             PopupEntry entry = popups.get(i);
             if (entry.modal) {
-                // Oscura ciò che sta sotto per dare risalto al popup.
+                // Oscura ciò che sta sotto per dare risalto al popup
                 canvas.drawColor(0x99000000);
             }
             entry.layout.draw(canvas);
         }
     }
 
+    // ***************************************
+    //  Input
+    // ***************************************
 
-    // ------------------------------------------------------------------
-    // Input
-    // ------------------------------------------------------------------
-
-    /**
-     * Processa la lista grezza di eventi ricevuta dal MultiTouchHandler.
-     * Restituisce gli eventi NON consumati dalla UI, da inoltrare alla
-     * scena di gioco sottostante (es. per pan/zoom della camera).
-     *
-     * La lista restituita è riusata internamente: non conservarne un
-     * riferimento oltre il frame corrente.
-     */
     public boolean processInput(Input.TouchEvent event) {
         if(event == null) return false;
 
@@ -196,26 +141,19 @@ public class UIController {
     }
 
     private boolean handleTouchDown(Input.TouchEvent event) {
-        if (activePointer != NO_POINTER) {
-            // La UI sta già gestendo un altro dito: questo passa alla scena.
-            return false;
-        }
 
         WidgetGroup topLayer = topLayer();
         Widget hitWidget = topLayer != null ? topLayer.hit(event.x, event.y) : null;
 
         if (hitWidget != null && hitWidget.touchDown(event.x, event.y, event.pointer)) {
-            activePointer = event.pointer;
-            activeWidget = hitWidget;
+            pointerOwners.put(event.pointer, hitWidget);
             return true;
         }
 
-        // arriva qua se l'if precedente non trova un widget
         if (isTopPopupModal()) {
             // Nessun widget colpito, ma il popup in cima è modale:
-            // blocchiamo comunque il tocco per non farlo passare alla scena.
-            activePointer = event.pointer;
-            activeWidget = null;
+            // blocca comunque il tocco
+            modalBlockedPointers.add(event.pointer);
             return true;
         }
 
@@ -223,36 +161,46 @@ public class UIController {
     }
 
     private boolean handleTouchDragged(Input.TouchEvent event) {
-        if (event.pointer != activePointer)
-            return false;
-        if (activeWidget != null) {
-            activeWidget.touchDragged(event.x, event.y, event.pointer);
+        Widget w = pointerOwners.get(event.pointer);
+        if (w != null) {
+            w.touchDragged(event.x, event.y, event.pointer);
+            return true;
         }
-        return true;
+        return modalBlockedPointers.contains(event.pointer);
     }
 
     private boolean handleTouchUp(Input.TouchEvent event) {
-        if (event.pointer != activePointer)
-            return false;
-        if (activeWidget != null) {
-            activeWidget.touchUp(event.x, event.y, event.pointer);
+        Widget w = pointerOwners.get(event.pointer);
+        if (w != null) {
+            w.touchUp(event.x, event.y, event.pointer);
+            pointerOwners.remove(event.pointer);
+            return true;
         }
-        activePointer = NO_POINTER;
-        activeWidget = null;
-        return true;
+        return modalBlockedPointers.remove(event.pointer);
     }
 
-    /*
-     * Ritorna il layer più alto attuale.
-     *  (devo controllare se è attivo?)
-     */
-    private WidgetGroup topLayer() {
-        if (popups.isEmpty()) return mainLayout;
-        return popups.get(popups.size() - 1).layout;
+    public void cancelPointer(int pointer) {
+        Widget w = pointerOwners.get(pointer);
+        if (w != null) w.touchCancelled(pointer);
+        pointerOwners.remove(pointer);
+        modalBlockedPointers.remove(pointer);
     }
 
-    private boolean isTopPopupModal() {
-        return !popups.isEmpty() && popups.get(popups.size() - 1).modal;
+    public void cancelAllPointers() {
+        for (int i = 0; i < pointerOwners.size(); i++) {
+            Widget w = pointerOwners.valueAt(i);
+            if (w != null) w.touchCancelled(pointerOwners.keyAt(i));
+        }
+        pointerOwners.clear();
+        modalBlockedPointers.clear();
     }
 
+    public void cancelPointerFor(Widget widget) {
+        for (int i = pointerOwners.size() - 1; i >= 0; i--) {
+            if (pointerOwners.valueAt(i) == widget) {
+                widget.touchCancelled(pointerOwners.keyAt(i));
+                pointerOwners.removeAt(i);
+            }
+        }
+    }
 }
