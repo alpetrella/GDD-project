@@ -103,5 +103,11 @@ public abstract class Widget {
     public boolean isVisible() { return visible; }
     public void setVisible(boolean visible) { this.visible = visible; }
 
-    public void setTouchable(Touchable t) { this.touchable = t; }
+    /*
+     * Attenzione: NON usare mentre this possiede un pointer.
+     *      UIController non viene notificato.
+     */
+    public void setTouchable(Touchable t) {
+        this.touchable = t;
+    }
 }

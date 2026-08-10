@@ -8,6 +8,8 @@ import com.badlogic.androidgames.framework.Input;
 import com.badlogic.androidgames.framework.impl.TouchHandler;
 import com.gdd.game.engine.Box;
 import com.gdd.game.ui.Button;
+import com.gdd.game.ui.Image;
+import com.gdd.game.ui.Label;
 import com.gdd.game.ui.UIController;
 import com.gdd.game.ui.WidgetGroup;
 import com.gdd.game.ui.WidgetGroupImp;
@@ -66,12 +68,16 @@ public class Game {
 
         WidgetGroup mainLayout = new WidgetGroupImp(0, 0, fbufferWidth, fbufferHeight);
 
-        Button pauseButton = new Button(50, 50, 200, 100, "PAUSE");
+        Button pauseButton = new Button(50, 50, 100, 50, "PAUSE");
         mainLayout.addChild(pauseButton);
         uiController.setRoot(mainLayout);
 
-        Button quackButton = new Button(900, 500, 300, 100, "A");
-        mainLayout.addChild(quackButton);
+        Image quackImage = new Image(200, 50, 200, 200, Assets.NEST_BITMAP);
+        mainLayout.addChild(quackImage);
+        uiController.setRoot(mainLayout);
+
+        Label quackLabel = new Label(600, 50, 100, 50, "CiAo");
+        mainLayout.addChild(quackLabel);
         uiController.setRoot(mainLayout);
 
         WidgetGroup pauseLayout = new WidgetGroupImp(0, 0, fbufferWidth, fbufferHeight);

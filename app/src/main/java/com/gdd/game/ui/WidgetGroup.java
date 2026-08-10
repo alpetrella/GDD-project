@@ -63,6 +63,7 @@ public abstract class WidgetGroup extends Widget {
 
     /*
      * Attenzione: NON usare mentre il child possiede un pointer.
+     *          UIController non viene notificato.
      */
     public void removeChild(Widget w) {
         if (children.remove(w)) {
@@ -72,6 +73,7 @@ public abstract class WidgetGroup extends Widget {
 
     /*
      * Attenzione: NON usare mentre il child possiede un pointer.
+     *          UIController non viene notificato.
      */
     public void clearChildren() {
         for (int i = 0; i < children.size(); i++) {
