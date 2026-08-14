@@ -27,8 +27,6 @@ public class UIController {
         }
     }
 
-    private float screenW, screenH;
-
     private WidgetGroup root;
     private final List<PopupEntry> popups = new ArrayList<>();
 
@@ -36,9 +34,7 @@ public class UIController {
     private final Set<Integer> modalBlockedPointers = new HashSet<>(); // pointer bloccati da popup modale senza widget cliccato
 
 
-    public UIController(int screenW, int screenH) {
-        this.screenW = screenW;
-        this.screenH = screenH;
+    public UIController() {
     }
 
     // ***************************************
@@ -47,8 +43,6 @@ public class UIController {
 
     public void setRoot(WidgetGroup root) {
         this.root = root;
-        root.setPosition(0, 0);
-        root.setSize(screenW, screenH);
     }
 
     public WidgetGroup getRoot() {
@@ -64,6 +58,9 @@ public class UIController {
         popups.add(new PopupEntry(layout, modal));
     }
 
+    /*
+     * Rimuove il popup più in alto.
+     */
     public void hideTopPopup() {
         if (!popups.isEmpty()) {
             popups.remove(popups.size() - 1);

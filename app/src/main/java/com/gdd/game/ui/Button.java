@@ -2,6 +2,7 @@ package com.gdd.game.ui;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.text.method.Touch;
 
 public class Button extends Widget {
 
@@ -58,15 +59,18 @@ public class Button extends Widget {
 
     @Override
     public void draw(Canvas canvas) {
+        validateTransform(); // <- richiamalo altrove!
+
         Paint background = touchable != Touchable.ENABLED
                 ? paintDisabled
                 : (state == State.PRESSED ? paintPressed : paintUp);
 
-        canvas.drawRoundRect(x, y, x + width, y + height, 12f, 12f, background);
+        canvas.drawRoundRect(absX, absY, absX + width, absY + height,
+                12f, 12f, background);
 
         if (text != null) {
-            float cx = x + width / 2f;
-            float cy = y + height / 2f - (textPaint.ascent() + textPaint.descent()) / 2f;
+            float cx = absX + width / 2f;
+            float cy = absY + height / 2f - (textPaint.ascent() + textPaint.descent()) / 2f;
             canvas.drawText(text, cx, cy, textPaint);
         }
     }
@@ -119,6 +123,19 @@ public class Button extends Widget {
 
     public void setText(String text) { this.text = text; }
 
+    public void setTextSize(float size) {
+        textPaint.setTextSize(height * size);
+    }
+
+    public void setTextColor(int color) {
+        textPaint.setColor(color);
+    }
+
+    public void setColor(int color) {
+        // TODO: gestire i 3 diversi colori per stato
+        paintUp.setColor(color);
+    }
+
     public void setOnClickListener(OnClickListener listener) { this.listener = listener; }
 
     @Override
@@ -129,5 +146,19 @@ public class Button extends Widget {
             owningPointer = -1;
             state = State.IDLE;
         }
+    }
+
+    // ********************************
+    //  Misc
+    // ********************************
+
+    // da fixare,per i problemi di "setTouchable"
+
+    public void enable() {
+        touchable = Touchable.ENABLED;
+    }
+
+    public void disable() {
+        touchable = Touchable.DISABLED;
     }
 }

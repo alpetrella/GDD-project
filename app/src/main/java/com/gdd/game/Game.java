@@ -3,23 +3,24 @@ package com.gdd.game;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 
 import com.badlogic.androidgames.framework.Input;
 import com.badlogic.androidgames.framework.impl.TouchHandler;
 import com.gdd.game.engine.Box;
 import com.gdd.game.ui.Button;
-import com.gdd.game.ui.Image;
-import com.gdd.game.ui.Label;
+import com.gdd.game.ui.Panel;
 import com.gdd.game.ui.UIController;
+import com.gdd.game.ui.Widget;
 import com.gdd.game.ui.WidgetGroup;
-import com.gdd.game.ui.WidgetGroupImp;
 
 public class Game {
 
-    enum State { RUNNING, PAUSED }
-
-    State state = State.RUNNING;
+    public enum Screen { START, GAMEPLAY }
+    public enum State { PLAYING, PAUSED }
     public final Activity activity;
+    public State state;
+    public Screen screen;
 
     // Rendering
     public static final int fbufferWidth = Settings.fbufferWidth,
@@ -29,7 +30,7 @@ public class Game {
 
     // Controller
     private final UIController uiController;
-    private GameWorld sceneController;
+    private GameWorld gameWorld;
 
     public final Box worldSize, // physics world's size (in meters)
             screenSize, // smartphone's screen size (in pixel)
@@ -37,13 +38,21 @@ public class Game {
 
     // Input
     private TouchHandler touchHandler;
-    boolean consumed;
+    private boolean consumed;
+
+    // Menu
+    private WidgetGroup mainMenu, gameMenu;
+    private WidgetGroup pausePopup;
+    private Panel cardPanel;
 
 
     /*
      * Constructor.
      */
     public Game(Activity activity, Bitmap frameBuffer, Box worldSize, Box screenSize) {
+
+        screen = Screen.GAMEPLAY;
+        state = State.PLAYING;
 
         this.worldSize = worldSize;
         this.screenSize = screenSize;
@@ -53,9 +62,9 @@ public class Game {
         cameraView = new Box(worldSize); // di default vede l'intero mondo
         canvas = new Canvas(frameBuffer);
 
-        sceneController = new GameWorld(this);
+        gameWorld = new GameWorld(this);
 
-        uiController = new UIController(Settings.fbufferWidth, Settings.fbufferHeight);
+        uiController = new UIController();
         initUI();
     }
 
@@ -64,35 +73,83 @@ public class Game {
     // Initialize
     // ------------------------------------------------------------------
 
-    public void initUI() {
+    private void initUI() {
 
-        WidgetGroup mainLayout = new WidgetGroupImp(0, 0, fbufferWidth, fbufferHeight);
+        // ***** GAMEPLAY MENU *****
+        gameMenu = new Panel(0, 0, fbufferWidth, fbufferHeight);
 
-        Button pauseButton = new Button(50, 50, 100, 50, "PAUSE");
-        mainLayout.addChild(pauseButton);
-        uiController.setRoot(mainLayout);
+        Button pauseButton = new Button(1100, 30, 100, 50, "PAUSE");
+        gameMenu.addChild(pauseButton);
 
-        Image quackImage = new Image(200, 50, 200, 200, Assets.NEST_BITMAP);
-        mainLayout.addChild(quackImage);
-        uiController.setRoot(mainLayout);
+        uiController.setRoot(gameMenu);
 
-        Label quackLabel = new Label(600, 50, 100, 50, "CiAo");
-        mainLayout.addChild(quackLabel);
-        uiController.setRoot(mainLayout);
+        initUIGameplay();
 
-        WidgetGroup pauseLayout = new WidgetGroupImp(0, 0, fbufferWidth, fbufferHeight);
-        Button resumeButton = new Button(500, 500, 200, 100, "RESUME");
-        pauseLayout.addChild(resumeButton);
+        // ***** PAUSE POPUP *****
+        pausePopup = new Panel(0, 0, fbufferWidth, fbufferHeight);
 
+        Button resumeButton = new Button(500, 150, 250, 200, "RESUME");
+        resumeButton.setTextSize(0.3f);
+        pausePopup.addChild(resumeButton);
+
+        // ***** CLICKS *****
         pauseButton.setOnClickListener(b -> {
-            uiController.showPopup(pauseLayout);
+            uiController.showPopup(pausePopup);
             state = State.PAUSED;
         });
 
         resumeButton.setOnClickListener(b -> {
             uiController.hideTopPopup();
-            state = State.RUNNING;
+            state = State.PLAYING;
         });
+    }
+
+    private void initUIGameplay() {
+
+        cardPanel = new Panel(10, 360, 150, 360);
+        cardPanel.setBorder(true, Color.LTGRAY);
+        cardPanel.setTouchable(Widget.Touchable.ENABLED);
+        gameMenu.addChild(cardPanel);
+
+        Button buttonCard = new Button(30, 100, 100, 200, "CARD");
+        buttonCard.setTextSize(0.2f);
+        cardPanel.addChild(buttonCard);
+
+        Button confirmCard = new Button(10, 10, 50, 50, "Y");
+        confirmCard.setColor(Color.GREEN);
+        confirmCard.setVisible(false);
+        cardPanel.addChild(confirmCard);
+
+        Button cancelCard = new Button(80, 10, 50, 50, "X");
+        cancelCard.setColor(Color.RED);
+        cancelCard.setVisible(false);
+        cardPanel.addChild(cancelCard);
+
+        // ***** ON CLICK *****
+        buttonCard.setOnClickListener(b -> {
+            confirmCard.setVisible(true);
+            cancelCard.setVisible(true);
+            buttonCard.disable();
+
+            gameWorld.showCardArea(true);
+        });
+
+        confirmCard.setOnClickListener(b -> {
+            confirmCard.setVisible(false);
+            cancelCard.setVisible(false);
+            buttonCard.enable();
+
+            gameWorld.showCardArea(false);
+        });
+
+        cancelCard.setOnClickListener(b -> {
+            confirmCard.setVisible(false);
+            cancelCard.setVisible(false);
+            buttonCard.enable();
+
+            gameWorld.showCardArea(false);
+        });
+
     }
 
 
@@ -114,13 +171,17 @@ public class Game {
         // Handle touch events
         for (Input.TouchEvent event: touchHandler.getTouchEvents()) {
             consumed = uiController.processInput(event);
-             if(!consumed && state == State.RUNNING)
-                 sceneController.processInput(event);
+
+             if(!consumed) {
+                 if(screen == Screen.GAMEPLAY && state == State.PLAYING) {
+                     gameWorld.processInput(event);
+                 }
+             }
         }
 
         // update scene state
-        if(state == State.RUNNING) {
-            sceneController.update(deltaTime);
+        if(screen == Screen.GAMEPLAY && state == State.PLAYING) {
+            gameWorld.update(deltaTime);
         }
     }
 
@@ -130,7 +191,9 @@ public class Game {
         // clear the screen with white
         canvas.drawARGB(255, 255, 255, 255);
         // render scene
-        sceneController.render(canvas);
+        if(screen == Screen.GAMEPLAY) {
+            gameWorld.render(canvas);
+        }
         // render ui
         uiController.draw(canvas);
     }
@@ -147,4 +210,5 @@ public class Game {
         }
     }
     */
+
 }

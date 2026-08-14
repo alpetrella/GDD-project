@@ -1,10 +1,13 @@
 package com.gdd.game;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 
 import com.badlogic.androidgames.framework.Input;
 import com.gdd.game.engine.Camera;
 import com.gdd.game.engine.actors.Actor;
+import com.gdd.game.engine.actors.ActorTag;
+import com.gdd.game.engine.components.BoxRenderComp;
 import com.gdd.game.engine.factories.AntFactory;
 import com.gdd.game.engine.factories.FoodFactory;
 import com.gdd.game.engine.factories.WildInsectFactory;
@@ -40,6 +43,7 @@ public class GameWorld {
     // ACTORS
     private long nextId = 0;
     private List<Actor> actors;
+    private Actor cardArea;
 
 
     // ------------------------------------------------------------------
@@ -71,6 +75,7 @@ public class GameWorld {
         // TEST
         actors = new ArrayList<>();
         initActors();
+        buildArea();
     }
 
     public void initActors() {
@@ -125,4 +130,23 @@ public class GameWorld {
         sGraphics.render(canvas, camera, actors);
     }
 
+
+    // ------------------------------------------------------------------
+    // Gameplay
+    // ------------------------------------------------------------------
+
+    public void showCardArea(boolean flag) {
+
+
+    }
+
+    private void buildArea() {
+        cardArea = new Actor(nextId++);
+        cardArea.tag = ActorTag.EMPTY;
+        cardArea.transform.x = -5;
+        cardArea.transform.halfWidth = 2.5f;
+        cardArea.transform.halfHeight = 2.5f;
+        cardArea.addComponent(new BoxRenderComp(Color.BLACK, false));
+        actors.add(cardArea);
+    }
 }

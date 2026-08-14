@@ -14,6 +14,7 @@ public abstract class Widget {
     protected float absX, absY; // coordinate assolute
     protected boolean transformDirty = true;
     protected boolean visible = true;
+    protected boolean enable = true;
     protected Touchable touchable = Touchable.ENABLED;
     protected WidgetGroup parent;
 
@@ -46,7 +47,9 @@ public abstract class Widget {
     //  Render
     // ***************************************
 
-    // Deve disegnare in coordinate assolute
+    /*
+     * Deve disegnare in coordinate assolute
+     */
     public abstract void draw(Canvas canvas);
 
     // ***************************************
@@ -57,13 +60,13 @@ public abstract class Widget {
      * Verifica l'input, in coordinate assolute.
      */
     public Widget hit(float x, float y) {
-        if (!visible || touchable != Touchable.ENABLED) return null;
+        if (!visible || touchable == Touchable.DISABLED) return null;
         validateTransform();
         return (x >= absX && x < absX + width && y >= absY && y < absY + height) ? this : null;
     }
 
     /*
-     * Verifica la posizione di un punto (x,y), usato internamente.
+     * Verifica se il punto (x,y) in coordinate assolute è dentro il widget.
      */
     public boolean contains(float x, float y) {
         validateTransform();
@@ -82,9 +85,6 @@ public abstract class Widget {
     //  Getter / Setter
     // ********************************
 
-    public WidgetGroup getParent() { return parent; }
-    public void setParent(WidgetGroup parent) { this.parent = parent; }
-
     public float getX() { return x; }
     public float getY() { return y; }
     public float getWidth() { return width; }
@@ -102,6 +102,9 @@ public abstract class Widget {
 
     public boolean isVisible() { return visible; }
     public void setVisible(boolean visible) { this.visible = visible; }
+
+    public WidgetGroup getParent() { return parent; }
+    public void setParent(WidgetGroup parent) { this.parent = parent; }
 
     /*
      * Attenzione: NON usare mentre this possiede un pointer.

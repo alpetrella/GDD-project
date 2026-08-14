@@ -26,7 +26,7 @@ public abstract class WidgetGroup extends Widget {
 
     @Override
     public void draw(Canvas canvas) {
-        validateTransform();
+        validateTransform(); // <- serve qui?
         for (int i = 0; i < children.size(); i++) {
             Widget c = children.get(i);
             if (c.visible) c.draw(canvas);
