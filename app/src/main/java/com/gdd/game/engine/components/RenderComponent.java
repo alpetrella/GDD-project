@@ -11,7 +11,7 @@ public abstract class RenderComponent extends Component {
 
     @Override
     public final ComponentType type() {
-        return ComponentType.DRAWABLE;
+        return ComponentType.RENDER;
     }
 
     /** Offset visivo in gradi, sommato alla rotazione fisica dal RenderManager */

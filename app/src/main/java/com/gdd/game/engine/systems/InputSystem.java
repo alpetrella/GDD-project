@@ -1,14 +1,20 @@
 package com.gdd.game.engine.systems;
 
 import com.badlogic.androidgames.framework.Input;
+import com.gdd.game.GameWorld;
 import com.gdd.game.engine.Camera;
 import com.gdd.game.engine.PointerTracker;
+import com.gdd.game.engine.actors.Actor;
+import com.gdd.game.engine.components.ComponentType;
+import com.gdd.game.engine.components.InputComponent;
 
 /*
  * Gestisce l'input nella scena.
  * Riconosce al più 2 touch contemporaneamente.
  */
 public class InputSystem {
+
+    public GameWorld gw;
 
     public enum GestureState { IDLE, PENDING, PANNING, PINCH_ZOOM, DRAG }
     private GestureState state = GestureState.IDLE;
@@ -21,21 +27,8 @@ public class InputSystem {
     //  Object interaction
     // ********************************
 
-    public interface Interactable {
-        boolean isDraggable();
-        void onTap();
-        void onDragStart(float worldX, float worldY);
-        void onDrag(float worldX, float worldY);
-        void onDragEnd(float worldX, float worldY);
-        void onDragCancel();
-    }
-
-    public interface InteractableLocator {
-        Interactable hit(float worldX, float worldY);
-    }
-
-    private InteractableLocator iLocator;
-    private Interactable iTarget;
+    private Actor actorTarget;
+    private InputComponent inputTarget;
 
 
     /*
@@ -73,11 +66,10 @@ public class InputSystem {
 
             float worldX = camera.toMetersX(event.x);
             float worldY = camera.toMetersY(event.y);
-            Interactable hit = iLocator != null ? iLocator.hit(worldX, worldY) : null;
-            if(hit != null) {
-                iTarget = hit;
+            actorTarget = gw.hit(worldX, worldY);
+            if(actorTarget != null) {
+                inputTarget = (InputComponent) actorTarget.getComponent(ComponentType.INPUT);
             }
-
             state = GestureState.PENDING;
         }
         else if(state == GestureState.PENDING) {
@@ -101,8 +93,8 @@ public class InputSystem {
 
         if (state == GestureState.PENDING) {
             // PENDING -> DRAG
-            if(iTarget != null && iTarget.isDraggable()) {
-                iTarget.onDragStart(camera.toMetersX(event.x), camera.toMetersY(event.y));
+            if(inputTarget != null && inputTarget.isDraggable()) {
+                inputTarget.onDragStart(camera.toMetersX(event.x), camera.toMetersY(event.y));
                 state = GestureState.DRAG;
             }
             // PENDING -> PANNING
@@ -124,7 +116,12 @@ public class InputSystem {
             pointers.updatePointer(event.pointer, event.x, event.y);
             camera.updatePinch(pointers.pinchMidX(), pointers.pinchMidY(), pointers.pinchDistance());
         } else if(state == GestureState.DRAG) {
-            iTarget.onDragStart(camera.toMetersX(event.x), camera.toMetersY(event.y));
+            if(inputTarget != null) {
+                float dx = pointers.deltaX(event.pointer, event.x);
+                float dy = pointers.deltaY(event.pointer, event.y);
+                pointers.updatePointer(event.pointer, event.x, event.y);
+                inputTarget.onDrag(camera.toMetersXLength(dx), camera.toMetersYLength(dy));
+            }
         }
     }
 
@@ -133,13 +130,12 @@ public class InputSystem {
         if(!pointers.hasPointer(event.pointer))
             return;
 
-        pointers.removePointer(event.pointer);
-
         if(state == GestureState.PENDING) {
-            if(iTarget != null) {
-                iTarget.onTap();
-                iTarget = null;
+            if(inputTarget != null) {
+                inputTarget.onTap();
             }
+            inputTarget = null;
+            actorTarget = null;
             state = GestureState.IDLE;
         } else if (state == GestureState.PANNING) {
             state = GestureState.IDLE;
@@ -147,9 +143,13 @@ public class InputSystem {
             camera.endPinch();
             state = GestureState.PANNING;
         } else if (state == GestureState.DRAG) {
-            iTarget.onDragEnd(camera.toMetersX(event.x), camera.toMetersY(event.y));
-            iTarget = null;
+            inputTarget.onDragEnd(camera.toMetersX(event.x), camera.toMetersY(event.y));
+            inputTarget = null;
+            actorTarget = null;
+            state = GestureState.IDLE;
         }
+
+        pointers.removePointer(event.pointer);
     }
 
     // ********************************
@@ -172,14 +172,11 @@ public class InputSystem {
         if (state == GestureState.PINCH_ZOOM) {
             camera.endPinch();
         } else if (state == GestureState.DRAG) {
-            iTarget.onDragCancel();
+            inputTarget.onDragCancel();
         }
-        iTarget = null;
+        inputTarget = null;
+        actorTarget = null;
         pointers.removePointers();
         state = GestureState.IDLE;
-    }
-
-    public void setInteractableLocator(InteractableLocator locator) {
-        this.iLocator = locator;
     }
 }

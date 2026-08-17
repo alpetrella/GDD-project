@@ -7,7 +7,9 @@ import com.badlogic.androidgames.framework.Input;
 import com.gdd.game.engine.Camera;
 import com.gdd.game.engine.actors.Actor;
 import com.gdd.game.engine.actors.ActorTag;
+import com.gdd.game.engine.actors.Transform;
 import com.gdd.game.engine.components.BoxRenderComp;
+import com.gdd.game.engine.components.InputComponent;
 import com.gdd.game.engine.factories.AntFactory;
 import com.gdd.game.engine.factories.FoodFactory;
 import com.gdd.game.engine.factories.WildInsectFactory;
@@ -62,6 +64,7 @@ public class GameWorld {
 
         // SYSTEMS
         sInput = new InputSystem(camera);
+        sInput.gw = this;
         sGraphics = new RenderSystem();
         sAudio = new AudioSystem();
         sPhysics = new PhysicsSystem(Settings.worldWidth, Settings.worldHeight);
@@ -146,7 +149,23 @@ public class GameWorld {
         cardArea.transform.x = -5;
         cardArea.transform.halfWidth = 2.5f;
         cardArea.transform.halfHeight = 2.5f;
+        cardArea.addComponent(new InputComponent());
         cardArea.addComponent(new BoxRenderComp(Color.BLACK, false));
         actors.add(cardArea);
+    }
+
+    public Actor hit(float worldX, float worldY) {
+        int n = actors.size();
+        for(int i=0; i<n; i++) {
+
+            Actor actor = actors.get(i);
+            Transform t = (Transform) actor.getTransform();
+
+            if(worldX >= t.x - t.halfWidth && worldX <= t.x + t.halfWidth &&
+                    worldY >= t.y - t.halfHeight && worldY <= t.y + t.halfHeight) {
+                return actor;
+            }
+        }
+        return null;
     }
 }

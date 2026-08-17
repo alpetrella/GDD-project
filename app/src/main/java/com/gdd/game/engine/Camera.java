@@ -206,9 +206,14 @@ public class Camera {
     public float toMetersX(float x) { return cameraView.xmin + x * (cameraView.width / fbufferWidth); }
     public float toMetersY(float y) { return cameraView.ymin + y * (cameraView.height / fbufferHeight); }
 
+    public float toMetersXLength(float x) { return x / fbufferWidth * cameraView.width; }
+
+    public float toMetersYLength(float y) { return y / fbufferHeight * cameraView.height; }
+
     public float toPixelsX(float x) { return (x - cameraView.xmin) / cameraView.width * fbufferWidth; }
     public float toPixelsY(float y) { return (y - cameraView.ymin) / cameraView.height * fbufferHeight; }
 
     public float toPixelsXLength(float x) { return x / cameraView.width * fbufferWidth; }
     public float toPixelsYLength(float y) { return y / cameraView.height * fbufferHeight; }
+
 }

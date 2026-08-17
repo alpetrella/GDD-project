@@ -32,7 +32,7 @@ public class RenderSystem {
         for(int i=0; i<n; i++)  {
 
             Actor actor = actors.get(i);
-            RenderComponent dc = (RenderComponent) actor.getComponent(ComponentType.DRAWABLE);
+            RenderComponent dc = (RenderComponent) actor.getComponent(ComponentType.RENDER);
             if(dc == null)
                 continue;
 
