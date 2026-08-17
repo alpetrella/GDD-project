@@ -10,12 +10,33 @@ import com.gdd.game.engine.PointerTracker;
  */
 public class InputSystem {
 
-    public enum GestureState { IDLE, PENDING, PANNING, PINCH_ZOOM }
+    public enum GestureState { IDLE, PENDING, PANNING, PINCH_ZOOM, DRAG }
     private GestureState state = GestureState.IDLE;
     private final Camera camera;
 
-    private static final float PAN_THRESHOLD = 20f;
+    public static final float PAN_THRESHOLD = 20f;
     private PointerTracker pointers = new PointerTracker();
+
+    // ********************************
+    //  Object interaction
+    // ********************************
+
+    public interface Interactable {
+        boolean isDraggable();
+        void onTap();
+        void onDragStart(float worldX, float worldY);
+        void onDrag(float worldX, float worldY);
+        void onDragEnd(float worldX, float worldY);
+        void onDragCancel();
+    }
+
+    public interface InteractableLocator {
+        Interactable hit(float worldX, float worldY);
+    }
+
+    private InteractableLocator iLocator;
+    private Interactable iTarget;
+
 
     /*
      * Constructor.
@@ -49,6 +70,14 @@ public class InputSystem {
 
         if(state == GestureState.IDLE) {
             pointers.addPointer(event.pointer, event.x, event.y);
+
+            float worldX = camera.toMetersX(event.x);
+            float worldY = camera.toMetersY(event.y);
+            Interactable hit = iLocator != null ? iLocator.hit(worldX, worldY) : null;
+            if(hit != null) {
+                iTarget = hit;
+            }
+
             state = GestureState.PENDING;
         }
         else if(state == GestureState.PENDING) {
@@ -71,11 +100,20 @@ public class InputSystem {
             return;
 
         if (state == GestureState.PENDING) {
-            float totalDx = pointers.totalDeltaX(event.pointer, event.x);
-            float totalDy = pointers.totalDeltaY(event.pointer, event.y);
-            pointers.updatePointer(event.pointer, event.x, event.y);
-            if (totalDx * totalDx + totalDy * totalDy > PAN_THRESHOLD * PAN_THRESHOLD) {
-                state = GestureState.PANNING;
+            // PENDING -> DRAG
+            if(iTarget != null && iTarget.isDraggable()) {
+                iTarget.onDragStart(camera.toMetersX(event.x), camera.toMetersY(event.y));
+                state = GestureState.DRAG;
+            }
+            // PENDING -> PANNING
+            else {
+                float totalDx = pointers.totalDeltaX(event.pointer, event.x);
+                float totalDy = pointers.totalDeltaY(event.pointer, event.y);
+                pointers.updatePointer(event.pointer, event.x, event.y);
+                // passa al panning se superata una certa soglia con il dito
+                if (totalDx * totalDx + totalDy * totalDy > PAN_THRESHOLD * PAN_THRESHOLD) {
+                    state = GestureState.PANNING;
+                }
             }
         } else if (state == GestureState.PANNING) {
             float dx = pointers.deltaX(event.pointer, event.x);
@@ -85,6 +123,8 @@ public class InputSystem {
         } else if (state == GestureState.PINCH_ZOOM) {
             pointers.updatePointer(event.pointer, event.x, event.y);
             camera.updatePinch(pointers.pinchMidX(), pointers.pinchMidY(), pointers.pinchDistance());
+        } else if(state == GestureState.DRAG) {
+            iTarget.onDragStart(camera.toMetersX(event.x), camera.toMetersY(event.y));
         }
     }
 
@@ -96,12 +136,19 @@ public class InputSystem {
         pointers.removePointer(event.pointer);
 
         if(state == GestureState.PENDING) {
+            if(iTarget != null) {
+                iTarget.onTap();
+                iTarget = null;
+            }
             state = GestureState.IDLE;
         } else if (state == GestureState.PANNING) {
             state = GestureState.IDLE;
         } else if (state == GestureState.PINCH_ZOOM) {
             camera.endPinch();
             state = GestureState.PANNING;
+        } else if (state == GestureState.DRAG) {
+            iTarget.onDragEnd(camera.toMetersX(event.x), camera.toMetersY(event.y));
+            iTarget = null;
         }
     }
 
@@ -124,8 +171,15 @@ public class InputSystem {
     public void reset() {
         if (state == GestureState.PINCH_ZOOM) {
             camera.endPinch();
+        } else if (state == GestureState.DRAG) {
+            iTarget.onDragCancel();
         }
+        iTarget = null;
         pointers.removePointers();
         state = GestureState.IDLE;
+    }
+
+    public void setInteractableLocator(InteractableLocator locator) {
+        this.iLocator = locator;
     }
 }
