@@ -10,6 +10,7 @@ import com.badlogic.androidgames.framework.impl.TouchHandler;
 import com.gdd.game.engine.Box;
 import com.gdd.game.ui.Button;
 import com.gdd.game.ui.Panel;
+import com.gdd.game.ui.TextButton;
 import com.gdd.game.ui.UIController;
 import com.gdd.game.ui.Widget;
 import com.gdd.game.ui.WidgetGroup;
@@ -78,7 +79,8 @@ public class Game {
         // ***** GAMEPLAY MENU *****
         gameMenu = new Panel(0, 0, fbufferWidth, fbufferHeight);
 
-        Button pauseButton = new Button(1100, 30, 100, 50, "PAUSE");
+        TextButton pauseButton = new TextButton(1100, 30, 100, 50);
+        pauseButton.setText("PAUSE");
         gameMenu.addChild(pauseButton);
 
         uiController.setRoot(gameMenu);
@@ -88,7 +90,8 @@ public class Game {
         // ***** PAUSE POPUP *****
         pausePopup = new Panel(0, 0, fbufferWidth, fbufferHeight);
 
-        Button resumeButton = new Button(500, 150, 250, 200, "RESUME");
+        TextButton resumeButton = new TextButton(500, 150, 250, 200);
+        resumeButton.setText("RESUME");
         resumeButton.setTextSize(0.3f);
         pausePopup.addChild(resumeButton);
 
@@ -111,16 +114,19 @@ public class Game {
         cardPanel.setTouchable(Widget.Touchable.ENABLED);
         gameMenu.addChild(cardPanel);
 
-        Button buttonCard = new Button(30, 100, 100, 200, "CARD");
+        TextButton buttonCard = new TextButton(30, 100, 100, 200);
+        buttonCard.setText("CARD");
         buttonCard.setTextSize(0.2f);
         cardPanel.addChild(buttonCard);
 
-        Button confirmCard = new Button(10, 10, 50, 50, "Y");
+        TextButton confirmCard = new TextButton(10, 10, 50, 50);
+        confirmCard.setText("Y");
         confirmCard.setColor(Color.GREEN);
         confirmCard.setVisible(false);
         cardPanel.addChild(confirmCard);
 
-        Button cancelCard = new Button(80, 10, 50, 50, "X");
+        TextButton cancelCard = new TextButton(80, 10, 50, 50);
+        cancelCard.setText("X");
         cancelCard.setColor(Color.RED);
         cancelCard.setVisible(false);
         cardPanel.addChild(cancelCard);
