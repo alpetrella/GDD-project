@@ -83,8 +83,6 @@ public class Game {
         pauseButton.setText("PAUSE");
         gameMenu.addChild(pauseButton);
 
-        uiController.setRoot(gameMenu);
-
         initUIGameplay();
 
         // ***** PAUSE POPUP *****
@@ -97,6 +95,7 @@ public class Game {
 
         // ***** CLICKS *****
         pauseButton.setOnClickListener(b -> {
+            // TODO: chiamare il reset di input system
             uiController.showPopup(pausePopup);
             state = State.PAUSED;
         });
@@ -105,6 +104,9 @@ public class Game {
             uiController.hideTopPopup();
             state = State.PLAYING;
         });
+
+        uiController.setRoot(gameMenu);
+        uiController.updateLayout();
     }
 
     private void initUIGameplay() {

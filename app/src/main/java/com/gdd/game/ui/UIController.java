@@ -6,23 +6,21 @@ import android.util.SparseArray;
 import com.badlogic.androidgames.framework.Input;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-
+/*
+ * UIController gestisce l'intero ciclo di vita dell'UI nel gioco.
+ */
 public class UIController {
 
-    private static final int NO_POINTER = -1;
-
     private static final class PopupEntry {
-        final WidgetGroup layout;
+        final WidgetGroup popup;
         final boolean modal;
 
-        PopupEntry(WidgetGroup layout, boolean modal) {
-            this.layout = layout;
+        PopupEntry(WidgetGroup popup, boolean modal) {
+            this.popup = popup;
             this.modal = modal;
         }
     }
@@ -30,12 +28,8 @@ public class UIController {
     private WidgetGroup root;
     private final List<PopupEntry> popups = new ArrayList<>();
 
-    private final SparseArray<Widget> pointerOwners = new SparseArray<>(); // pointer posseduti
-    private final Set<Integer> modalBlockedPointers = new HashSet<>(); // pointer bloccati da popup modale senza widget cliccato
-
-
-    public UIController() {
-    }
+    private final SparseArray<Widget> pointerOwners = new SparseArray<>();// pointer e widget posseduti
+    private final Set<Integer> modalBlockedPointers = new HashSet<>(); // pointer bloccati da popup modale senza widget
 
     // ***************************************
     //  Layout
@@ -53,26 +47,15 @@ public class UIController {
         showPopup(popup, true);
     }
 
-    public void showPopup(WidgetGroup layout, boolean modal) {
+    public void showPopup(WidgetGroup popup, boolean modal) {
         if (modal) cancelAllPointers();
-        popups.add(new PopupEntry(layout, modal));
+        popups.add(new PopupEntry(popup, modal));
+        popup.validateTransform();
     }
 
-    /*
-     * Rimuove il popup più in alto.
-     */
     public void hideTopPopup() {
         if (!popups.isEmpty()) {
             popups.remove(popups.size() - 1);
-        }
-    }
-
-    public void hidePopup(WidgetGroup popup) {
-        for (int i = popups.size() - 1; i >= 0; i--) {
-            if (popups.get(i).layout == popup) {
-                popups.remove(i);
-                return;
-            }
         }
     }
 
@@ -86,11 +69,30 @@ public class UIController {
 
     private WidgetGroup topLayer() {
         if (popups.isEmpty()) return root;
-        return popups.get(popups.size() - 1).layout;
+        return popups.get(popups.size() - 1).popup;
     }
 
     private boolean isTopPopupModal() {
         return !popups.isEmpty() && popups.get(popups.size() - 1).modal;
+    }
+
+    // ***************************************
+    //  Layout
+    // ***************************************
+
+    /*
+     * Aggiorna le posizioni assolute dei widget.
+     */
+    public void updateLayout() {
+        if (root != null) {
+            root.validateTransform();
+        }
+
+        int n = popups.size();
+        for (int i = 0; i < n; i++) {
+            PopupEntry entry = popups.get(i);
+            entry.popup.validateTransform();
+        }
     }
 
     // ***************************************
@@ -109,7 +111,7 @@ public class UIController {
                 // Oscura ciò che sta sotto per dare risalto al popup
                 canvas.drawColor(0x99000000);
             }
-            entry.layout.draw(canvas);
+            entry.popup.draw(canvas);
         }
     }
 
@@ -138,7 +140,6 @@ public class UIController {
     }
 
     private boolean handleTouchDown(Input.TouchEvent event) {
-
         WidgetGroup topLayer = topLayer();
         Widget hitWidget = topLayer != null ? topLayer.hit(event.x, event.y) : null;
 
@@ -148,8 +149,6 @@ public class UIController {
         }
 
         if (isTopPopupModal()) {
-            // Nessun widget colpito, ma il popup in cima è modale:
-            // blocca comunque il tocco
             modalBlockedPointers.add(event.pointer);
             return true;
         }

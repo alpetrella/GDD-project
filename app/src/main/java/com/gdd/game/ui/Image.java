@@ -1,5 +1,4 @@
 package com.gdd.game.ui;
-
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -11,22 +10,11 @@ public class Image extends Widget {
     protected Paint paint;
     protected RectF dst = new RectF();
 
-    /*
-     * Costruttore.
-     */
+
     public Image(float x, float y, float width, float height)
     {
         super(x, y, width, height);
         this.paint = new Paint(Paint.FILTER_BITMAP_FLAG);
-    }
-
-    /*
-     * Costruttore.
-     */
-    public Image(float x, float y, float width, float height, Bitmap bitmap)
-    {
-        this(x, y, width, height);
-        this.bitmap = bitmap;
     }
 
     // ***************************************
