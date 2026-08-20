@@ -9,6 +9,7 @@ import com.gdd.game.engine.actors.Actor;
 import com.gdd.game.engine.actors.ActorTag;
 import com.gdd.game.engine.actors.Transform;
 import com.gdd.game.engine.components.BoxRenderComp;
+import com.gdd.game.engine.components.ComponentType;
 import com.gdd.game.engine.components.InputComponent;
 import com.gdd.game.engine.factories.AntFactory;
 import com.gdd.game.engine.factories.FoodFactory;
@@ -159,7 +160,10 @@ public class GameWorld {
         for(int i=0; i<n; i++) {
 
             Actor actor = actors.get(i);
-            Transform t = (Transform) actor.getTransform();
+            Transform t = actor.getTransform();
+
+            if(actor.getComponent(ComponentType.INPUT) == null)
+                continue;
 
             if(worldX >= t.x - t.halfWidth && worldX <= t.x + t.halfWidth &&
                     worldY >= t.y - t.halfHeight && worldY <= t.y + t.halfHeight) {
