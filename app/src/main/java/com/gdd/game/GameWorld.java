@@ -4,21 +4,21 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 
 import com.badlogic.androidgames.framework.Input;
-import com.gdd.game.engine.Camera;
-import com.gdd.game.engine.actors.Actor;
-import com.gdd.game.engine.actors.ActorTag;
-import com.gdd.game.engine.actors.Transform;
-import com.gdd.game.engine.components.BoxRenderComp;
-import com.gdd.game.engine.components.ComponentType;
-import com.gdd.game.engine.components.InputComponent;
-import com.gdd.game.engine.factories.AntFactory;
-import com.gdd.game.engine.factories.FoodFactory;
-import com.gdd.game.engine.factories.WildInsectFactory;
-import com.gdd.game.engine.factories.NestFactory;
-import com.gdd.game.engine.systems.AudioSystem;
-import com.gdd.game.engine.systems.InputSystem;
-import com.gdd.game.engine.systems.PhysicsSystem;
-import com.gdd.game.engine.systems.RenderSystem;
+import com.gdd.game.framework.Camera;
+import com.gdd.game.framework.actors.Actor;
+import com.gdd.game.framework.actors.ActorTag;
+import com.gdd.game.framework.actors.Transform;
+import com.gdd.game.framework.components.BoxRenderComp;
+import com.gdd.game.framework.components.ComponentType;
+import com.gdd.game.framework.components.InputComponent;
+import com.gdd.game.framework.factories.AntFactory;
+import com.gdd.game.framework.factories.FoodFactory;
+import com.gdd.game.framework.factories.WildInsectFactory;
+import com.gdd.game.framework.factories.NestFactory;
+import com.gdd.game.framework.systems.AudioSystem;
+import com.gdd.game.framework.systems.InputSystem;
+import com.gdd.game.framework.systems.PhysicsSystem;
+import com.gdd.game.framework.systems.RenderSystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class GameWorld {
 
-    private Game game;
+    private GameScreen game;
     private Camera camera;
 
     // MANAGERS
@@ -53,7 +53,7 @@ public class GameWorld {
     // Init
     // ------------------------------------------------------------------
 
-    public GameWorld(Game game) {
+    public GameWorld(GameScreen game) {
 
         this.game = game;
 
