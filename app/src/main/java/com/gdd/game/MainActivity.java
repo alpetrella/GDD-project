@@ -10,14 +10,15 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.badlogic.androidgames.framework.Audio;
-import com.badlogic.androidgames.framework.impl.AndroidAudio;
 import com.badlogic.androidgames.framework.impl.MultiTouchHandler;
 import com.badlogic.androidgames.framework.impl.TouchHandler;
 import com.gdd.game.framework.AndroidFastRenderView;
 import com.gdd.game.framework.Box;
 import com.gdd.game.framework.Game;
 import com.gdd.game.framework.Screen;
+import com.gdd.game.screen.GameScreen;
+import com.gdd.game.screen.LoadingScreen;
+import com.gdd.game.ui.UIController;
 
 public class MainActivity extends Activity implements Game {
 
@@ -31,6 +32,7 @@ public class MainActivity extends Activity implements Game {
 
     public Box screenSize;
     public Bitmap frameBuffer;
+    public UIController uiController;
 
 
     // ********************************
@@ -64,6 +66,7 @@ public class MainActivity extends Activity implements Game {
 
         renderView = new AndroidFastRenderView(this, frameBuffer);
         touchHandler = new MultiTouchHandler(renderView, scaleX, scaleY); // scale inputs from screen to framebuffer coordinates;
+        uiController = new UIController();
         screen = getStartScreen();
         setContentView(renderView);
     }
@@ -119,7 +122,7 @@ public class MainActivity extends Activity implements Game {
     }
 
     public Screen getStartScreen() {
-        return new GameScreen(this);
+        return new LoadingScreen(this);
     }
 
     public TouchHandler getTouchHandler() {
@@ -132,5 +135,9 @@ public class MainActivity extends Activity implements Game {
 
     public Box getScreensize() {
         return screenSize;
+    }
+
+    public UIController getUIController() {
+        return uiController;
     }
 }

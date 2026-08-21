@@ -1,4 +1,4 @@
-package com.gdd.game;
+package com.gdd.game.screen;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -6,6 +6,8 @@ import android.graphics.Color;
 
 import com.badlogic.androidgames.framework.Input;
 import com.badlogic.androidgames.framework.impl.TouchHandler;
+import com.gdd.game.GameWorld;
+import com.gdd.game.Settings;
 import com.gdd.game.framework.Box;
 import com.gdd.game.framework.Game;
 import com.gdd.game.framework.Screen;
@@ -68,7 +70,7 @@ public class GameScreen extends Screen {
 
         gameWorld = new GameWorld(this);
 
-        uiController = new UIController();
+        uiController = game.getUIController();
         initUI();
     }
 
@@ -78,6 +80,8 @@ public class GameScreen extends Screen {
     // ------------------------------------------------------------------
 
     private void initUI() {
+
+        uiController.reset();
 
         // ***** GAMEPLAY MENU *****
         gameMenu = new Panel(0, 0, fbufferWidth, fbufferHeight);

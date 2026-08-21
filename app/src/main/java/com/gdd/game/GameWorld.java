@@ -19,6 +19,7 @@ import com.gdd.game.framework.systems.AudioSystem;
 import com.gdd.game.framework.systems.InputSystem;
 import com.gdd.game.framework.systems.PhysicsSystem;
 import com.gdd.game.framework.systems.RenderSystem;
+import com.gdd.game.screen.GameScreen;
 
 import java.util.ArrayList;
 import java.util.List;

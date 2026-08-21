@@ -3,6 +3,7 @@ package com.gdd.game.framework;
 import android.graphics.Bitmap;
 
 import com.badlogic.androidgames.framework.impl.TouchHandler;
+import com.gdd.game.ui.UIController;
 
 public interface Game {
 
@@ -17,4 +18,6 @@ public interface Game {
     public Bitmap getFramebuffer();
 
     public Box getScreensize();
+
+    public UIController getUIController();
 }
