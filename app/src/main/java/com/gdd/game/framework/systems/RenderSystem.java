@@ -48,8 +48,7 @@ public class RenderSystem {
             float yPixel = camera.toPixelsY(transform.y);
             float hWidthPixel = camera.toPixelsXLength(transform.halfWidth);
             float hHeightPixel = camera.toPixelsYLength(transform.halfHeight);
-            float rotationDeg = (float) Math.toDegrees(transform.angle)
-                    + dc.getVisualAngleOffsetDeg(); // serve +90f?
+            float rotationDeg = (float) Math.toDegrees(transform.angle);
 
             scratchTransform.set(xPixel, yPixel, hWidthPixel, hHeightPixel,
                     rotationDeg, hWidthPixel);
